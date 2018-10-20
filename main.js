@@ -6,6 +6,7 @@ const roleCarrier = require('role.carrier');
 const roleRepairer = require('role.repairer');
 
 const spawnName = 'Spawnzilla_1';
+const spawner = Game.spawns[spawnName];
 
 const maxHarvesters = 0;
 const maxDistanceHarvesters = 0;
@@ -33,13 +34,13 @@ const managePopulation = () => {
 	const carriers = _.filter(Game.creeps, creep => creep.memory.role == 'carrier');
 	const repairers = _.filter(Game.creeps, creep => creep.memory.role == 'repairer');
 
-    if (harvesters.length < maxHarvesters) roleHarvester.spawn(Game.spawns[spawnName], Game.time);
-    if (upgraders.length < maxUpgraders) roleUpgrader.spawn(Game.spawns[spawnName], Game.time);
-    if (builders.length < maxBuilders) roleBuilder.spawn(Game.spawns[spawnName], Game.time);
-    if (distanceHarvesters.length < maxDistanceHarvesters) roleHarvester.spawn(Game.spawns[spawnName], Game.time, true);
-	if (miners.length < maxMiners) roleMiner.spawn(Game.spawns[spawnName], Game.time);
-	if (carriers.length < maxCarriers) roleCarrier.spawn(Game.spawns[spawnName], Game.time);
-	if (repairers.length < maxRepairers) roleRepairer.spawn(Game.spawns[spawnName], Game.time);
+    if (harvesters.length < maxHarvesters) roleHarvester.spawn(spawner);
+    if (upgraders.length < maxUpgraders) roleUpgrader.spawn(spawner);
+    if (builders.length < maxBuilders) roleBuilder.spawn(spawner);
+    if (distanceHarvesters.length < maxDistanceHarvesters) roleHarvester.spawn(spawner, true);
+	if (miners.length < maxMiners) roleMiner.spawn(spawner);
+	if (carriers.length < maxCarriers) roleCarrier.spawn(spawner);
+	if (repairers.length < maxRepairers) roleRepairer.spawn(spawner);
 }
 
 module.exports.loop = function() {
@@ -47,15 +48,15 @@ module.exports.loop = function() {
 
     managePopulation();
 
-    if (Game.spawns[spawnName].spawning) {
-        let spawningCreep = Game.creeps[Game.spawns[spawnName].spawning.name];
-        Game.spawns[spawnName].room.visual.text(
+    if (spawner.spawning) {
+        let spawningCreep = Game.creeps[spawner.spawning.name];
+        spawner.room.visual.text(
             '🛠️' + spawningCreep.memory.role,
-            Game.spawns[spawnName].pos.x + 1,
-            Game.spawns[spawnName].pos.y, { align: 'left', opacity: 0.8 });
+            spawner.pos.x + 1,
+            spawner.pos.y, { align: 'left', opacity: 0.8 });
     }
 
-    for (var name in Game.creeps) {
+    for (const name in Game.creeps) {
         let creep = Game.creeps[name];
 
         switch (creep.memory.role) {

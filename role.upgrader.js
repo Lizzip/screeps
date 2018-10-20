@@ -16,8 +16,8 @@ var roleUpgrader = {
     }
 };
 
-roleUpgrader.spawn = (spawner, time) => {
-	let newName = 'Upgrader' + time;
+roleUpgrader.spawn = spawner => {
+	let newName = 'Upgrader' + Game.time;
 	console.log('Spawning new Beyonce: ' + newName);
 	spawner.spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'upgrader' } });
 };

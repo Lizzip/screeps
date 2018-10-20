@@ -27,8 +27,8 @@ roleRepairer.run = creep => {
 	}	
 };
 
-roleRepairer.spawn = (spawner, time) => {
-	let newName = "Repair" + time;
+roleRepairer.spawn = spawner => {
+	let newName = "Repair" + Game.time;
 	console.log('Spawning new Repairer: ' + newName);
 	spawner.spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'repairer' } });
 };

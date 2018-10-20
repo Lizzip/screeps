@@ -30,14 +30,14 @@ const roleHarvester = {
     }
 };
 
-roleHarvester.spawn = (spawner, time, distance) => {
+roleHarvester.spawn = (spawner, distance) => {
 	if(!distance){
-		let newName = 'Harvester' + time;
+		let newName = 'Harvester' + Game.time;
 		console.log('Spawning new Wurzels: ' + newName);
 		spawner.spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'harvester' } });
 	}
 	else {	
-		let newName = 'DistHarvester' + time;
+		let newName = 'DistHarvester' + Game.time;
 		console.log('Spawning new Distance Wurzels: ' + newName);
 		spawner.spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'distHarvester' } });
 	}

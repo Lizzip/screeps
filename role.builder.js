@@ -50,8 +50,8 @@ const roleBuilder = {
     }
 };
 
-roleBuilder.spawn = (spawner, time) => {
-	let newName = 'Builder' + time;
+roleBuilder.spawn = spawner => {
+	let newName = 'Builder' + Game.time;
 	console.log('Spawning new 5H: ' + newName);
 	spawner.spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'builder' } });
 };

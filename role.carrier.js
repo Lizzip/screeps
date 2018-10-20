@@ -41,8 +41,8 @@ roleCarrier.run = creep => {
 	}	
 };
 
-roleCarrier.spawn = (spawner, time) => {
-	let newName = "Carrier" + time;
+roleCarrier.spawn = spawner => {
+	let newName = "Carrier" + Game.time;
 	console.log('Spawning new Carrier: ' + newName);
 	spawner.spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'carrier' } });
 };
