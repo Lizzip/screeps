@@ -1,7 +1,20 @@
 const utils = require('utils');
 const AI = require('creepAI');
 
-const roleUpgrader = {};
+const roleUpgrader = {
+	classes: [
+		{
+			type: "big",
+			cost: 400,
+			format: [WORK, WORK, CARRY, CARRY, MOVE, MOVE]
+		},
+		{
+			type: "basic",
+			cost: 200,
+			format: [WORK, CARRY, MOVE]
+		}
+	]
+};
 
 roleUpgrader.run = creep => {
 	if (creep.memory.upgrading && creep.carry.energy == 0) {
@@ -26,20 +39,7 @@ roleUpgrader.spawn = spawner => {
 	const role = 'upgrader';
 	const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
 	
-	const classes = [
-		{
-			type: "big",
-			cost: 400,
-			format: [WORK, WORK, CARRY, CARRY, MOVE, MOVE]
-		},
-		{
-			type: "basic",
-			cost: 200,
-			format: [WORK, CARRY, MOVE]
-		}
-	];
-	
-	classes.some(c => {
+	roleUpgrader.classes.some(c => {
 		if(c.cost <= currentEnergy){
 			let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
 			console.log('Spawning new Beyonce: ' + newName);

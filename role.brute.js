@@ -1,5 +1,24 @@
 const utils = require('utils');
-const roleBrute = {};
+
+const roleBrute = {
+	classes: [
+		{
+			type: "horse",
+			cost: 450,
+			format: [TOUGH, TOUGH, MOVE, MOVE, RANGED_ATTACK, MOVE, MOVE, ATTACK]
+		},
+		{
+			type: "archer",
+			cost: 330,
+			format: [MOVE, MOVE, ATTACK, RANGED_ATTACK]
+		},
+		{
+			type: "melee",
+			cost: 190,
+			format: [TOUGH, MOVE, MOVE, ATTACK]
+		}
+	]
+};
 
 roleBrute.run = creep => {
 	let target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
@@ -29,25 +48,7 @@ roleBrute.spawn = spawner => {
 	const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
 	const wallsDown = utils.anyWallsFallen();
 	
-	const classes = [
-		{
-			type: "horse",
-			cost: 450,
-			format: [TOUGH, TOUGH, MOVE, MOVE, RANGED_ATTACK, MOVE, MOVE, ATTACK]
-		},
-		{
-			type: "archer",
-			cost: 330,
-			format: [MOVE, MOVE, ATTACK, RANGED_ATTACK]
-		},
-		{
-			type: "melee",
-			cost: 190,
-			format: [TOUGH, MOVE, MOVE, ATTACK]
-		}
-	];
-	
-	classes.some(c => {
+	roleBrute.classes.some(c => {
 		if(c.cost <= currentEnergy){
 			let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
 			

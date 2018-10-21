@@ -1,7 +1,50 @@
 const utils = require('utils');
 const AI = require('creepAI');
 
-const roleRepairer = {};
+const roleRepairer = {
+	classes: [
+		{
+			type: "big",
+			cost: 400,
+			format: [WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE]
+		},
+		{
+			type: "basic",
+			cost: 200,
+			format: [WORK, CARRY, MOVE]
+		}
+	]
+};
+
+roleRepairer.getNextTarget = creep => {
+	let maxHitpoints = 3000;
+	const increment = 2000;
+	const maxTotal = 25000;
+	const rampartMultiplier = 3;
+	const wallMultiplier = 1.15;
+	
+	while(maxHitpoints < maxTotal){
+		const ramparts = roleRepairer.getRampartsForRepair(creep, maxHitpoints * rampartMultiplier);
+		if(ramparts.length) return ramparts[0];
+		
+		const walls = roleRepairer.getWallsForRepair(creep, maxHitpoints * wallMultiplier);
+		if(walls.length) return walls[0];
+		
+		const roads = roleRepairer.getRoadsForRepair(creep, maxHitpoints);
+		if(roads.length) return roads[0];
+
+		maxHitpoints += increment;
+	}
+	
+	const ramparts = roleRepairer.getRampartsForRepair(creep);
+	if(ramparts.length) return ramparts[0];
+	
+	const walls = roleRepairer.getWallsForRepair(creep);
+	if(walls.length) return walls[0];
+	
+	const roads = roleRepairer.getRoadsForRepair(creep);
+	if(roads.length) return roads[0];
+};
 
 roleRepairer.run = creep => {
 	if (creep.memory.repairing && creep.carry.energy == 0) {
@@ -15,57 +58,20 @@ roleRepairer.run = creep => {
 	if(creep.memory.repairing){
 		//Priority order:
 		// 1) Container
-		// 2) Rampart < 25k
-		// 3) Wall < 3000
-		// 4) Road < 3000
-		// 5) Wall < 5000
-		// 6) Rampart
-		// 7) Road
-		// 8) Wall
+		// In incremented iterations:
+		//   2) Rampart
+		//   3) Road
+		//   4) Wall
 		
 		const containers = roleRepairer.getContainersForRepair(creep);
 		let target = containers.length ? containers[0] : null;
-		let maxHitpoints = 3000;
 		
-		if(!target){
-			const ramparts = roleRepairer.getRampartsForRepair(creep, 25000);
-			target = ramparts.length ? ramparts[0] : null;
-		}
+		if(!target) target = roleRepairer.getNextTarget(creep);
 		
-		if(!target){
-			const walls = roleRepairer.getWallsForRepair(creep, maxHitpoints);
-			target = walls.length ? walls[0] : null;
-		}
-		
-		if(!target){
-			const roads = roleRepairer.getRoadsForRepair(creep, maxHitpoints);
-			target = roads.length ? roads[0] : null;
-		}
-		
-		maxHitpoints = 5000;
-		
-		if(!target){
-			const walls = roleRepairer.getWallsForRepair(creep, maxHitpoints);
-			target = walls.length ? walls[0] : null;
-		}
-		
-		if(!target){
-			const ramparts = roleRepairer.getRampartsForRepair(creep);
-			target = ramparts.length ? ramparts[0] : null;
-		}
-		
-		if(!target){
-			const roads = roleRepairer.getRoadsForRepair(creep);
-			target = roads.length ? roads[0] : null;
-		}
-		
-		if(!target){
-			const walls = roleRepairer.getWallsForRepair(creep);
-			target = walls.length ? walls[0] : null;
-		}
-		
-		if (creep.repair(target) == ERR_NOT_IN_RANGE) {
-			creep.moveTo(target,{ visualizePathStyle: { stroke: '#00ff00' } });
+		if(target){
+			if (creep.repair(target) == ERR_NOT_IN_RANGE) {
+				creep.moveTo(target,{ visualizePathStyle: { stroke: '#00ff00' } });
+			}
 		}
 	}
 	else {
@@ -82,7 +88,7 @@ roleRepairer.getRampartsForRepair = (creep, maxHit) => {
 	let filter = null;
 	
 	if(maxHit){
-		filter = s => (s.structureType == STRUCTURE_RAMPART && s.hits < maxHit);
+		filter = s => (s.structureType == STRUCTURE_RAMPART && s.hits < s.hitsMax && s.hits < maxHit);
 	}
 	else {
 		filter = s => (s.structureType == STRUCTURE_RAMPART && s.hits < s.hitsMax);
@@ -95,7 +101,7 @@ roleRepairer.getWallsForRepair = (creep, maxHit) => {
 	let filter = null;
 	
 	if(maxHit){
-		filter = s => (s.structureType == STRUCTURE_WALL && s.hits < maxHit);
+		filter = s => (s.structureType == STRUCTURE_WALL && s.hits < s.hitsMax && s.hits < maxHit);
 	}
 	else {
 		filter = s => (s.structureType == STRUCTURE_WALL && s.hits < s.hitsMax);
@@ -108,7 +114,7 @@ roleRepairer.getRoadsForRepair = (creep, maxHit) => {
 	let filter = null;
 	
 	if(maxHit){
-		filter = s => (s.structureType == STRUCTURE_ROAD && s.hits < maxHit);
+		filter = s => (s.structureType == STRUCTURE_ROAD && s.hits < s.hitsMax && s.hits < maxHit);
 	}
 	else {
 		filter = s => (s.structureType == STRUCTURE_ROAD && s.hits < s.hitsMax);
@@ -121,20 +127,7 @@ roleRepairer.spawn = spawner => {
 	const role = 'repairer';
 	const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
 	
-	const classes = [
-		{
-			type: "big",
-			cost: 400,
-			format: [WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE]
-		},
-		{
-			type: "basic",
-			cost: 200,
-			format: [WORK, CARRY, MOVE]
-		}
-	];
-	
-	classes.some(c => {
+	roleRepairer.classes.some(c => {
 		if(c.cost <= currentEnergy){
 			let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
 			console.log('Spawning new Repairer: ' + newName);

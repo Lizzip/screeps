@@ -1,5 +1,19 @@
 const utils = require('utils');
-const roleMiner = {};
+
+const roleMiner = {
+	classes: [
+		{
+			type: "big",
+			cost: 450,
+			format: [WORK, WORK, WORK, WORK, MOVE]
+		},
+		{
+			type: "basic",
+			cost: 250,
+			format: [WORK, WORK, MOVE]
+		}
+	]
+};
 
 roleMiner.run = creep => {
 	const notFullContainerFilter = s => (s.structureType == STRUCTURE_CONTAINER) && (s.store[RESOURCE_ENERGY] < s.storeCapacity);
@@ -34,21 +48,8 @@ roleMiner.run = creep => {
 roleMiner.spawn = spawner => {
 	const role = 'miner';
 	const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
-	
-	const classes = [
-		{
-			type: "big",
-			cost: 450,
-			format: [WORK, WORK, WORK, WORK, MOVE]
-		},
-		{
-			type: "basic",
-			cost: 250,
-			format: [WORK, WORK, MOVE]
-		}
-	];
-	
-	classes.some(c => {
+
+	roleMiner.classes.some(c => {
 		if(c.cost <= currentEnergy){
 			let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
 			console.log('Spawning new Miner: ' + newName);

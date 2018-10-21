@@ -1,7 +1,20 @@
 const utils = require('utils');
 const AI = require('creepAI');
 
-const roleBuilder = {};
+const roleBuilder = {
+	classes: [
+		{
+			type: "big",
+			cost: 400,
+			format: [WORK, WORK, CARRY, CARRY, MOVE, MOVE]
+		},
+		{
+			type: "basic",
+			cost: 200,
+			format: [WORK, CARRY, MOVE]
+		}
+	]
+};
 
 roleBuilder.run = creep => {
 	if (creep.memory.building && creep.carry.energy == 0) {
@@ -48,21 +61,8 @@ roleBuilder.build = (creep, target) => {
 roleBuilder.spawn = spawner => {
 	const role = 'builder';
 	const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
-	
-	const classes = [
-		{
-			type: "big",
-			cost: 400,
-			format: [WORK, WORK, CARRY, CARRY, MOVE, MOVE]
-		},
-		{
-			type: "basic",
-			cost: 200,
-			format: [WORK, CARRY, MOVE]
-		}
-	];
-	
-	classes.some(c => {
+
+	roleBuilder.classes.some(c => {
 		if(c.cost <= currentEnergy){
 			let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
 			console.log('Spawning new 5H: ' + newName);

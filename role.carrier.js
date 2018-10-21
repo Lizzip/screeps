@@ -1,7 +1,20 @@
 const utils = require('utils');
 const AI = require('creepAI');
 
-const roleCarrier = {};
+const roleCarrier = {
+	classes: [
+		{
+			type: "big",
+			cost: 350,
+			format: [WORK, CARRY, CARRY, CARRY, MOVE, MOVE]
+		},
+		{
+			type: "basic",
+			cost: 200,
+			format: [WORK, CARRY, MOVE]
+		}
+	]
+};
 
 roleCarrier.run = creep => {	
 	if (!creep.memory.gathering && creep.carry.energy == 0) {
@@ -38,20 +51,7 @@ roleCarrier.spawn = spawner => {
 	const role = 'carrier';
 	const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
 
-	const classes = [
-		{
-			type: "big",
-			cost: 350,
-			format: [WORK, CARRY, CARRY, CARRY, MOVE, MOVE]
-		},
-		{
-			type: "basic",
-			cost: 200,
-			format: [WORK, CARRY, MOVE]
-		}
-	];
-	
-	classes.some(c => {
+	roleCarrier.classes.some(c => {
 		if(c.cost <= currentEnergy){
 			let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
 			console.log('Spawning new Carrier: ' + newName);

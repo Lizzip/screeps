@@ -102,5 +102,4 @@ module.exports.loop = function() {
 	//Tower Control
 	turrets.buildIfIsDown(room);
 	turrets.defendRoom(room);
-    
 }
