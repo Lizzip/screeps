@@ -44,9 +44,12 @@ roleBuilder.run = creep => {
 				roleBuilder.build(creep, containers[0]);
 			} else if (nonRoads.length) {
                 roleBuilder.build(creep, nonRoads[0]);
-            } else {
+            } else if (targets[0]) {
                 roleBuilder.build(creep, targets[0]);
             }
+			else if(Game.flags.Flag1){
+				creep.moveTo(Game.flags.Flag1.pos);
+			}
         } else {
 			AI.locateEnergySource(creep);
         }

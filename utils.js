@@ -35,7 +35,7 @@ utils.nonFullContainerCount = () => {
 
 utils.numConstructionSites = () => {
 	const creep = utils.getAnyCreep();
-	return creep.room.find(FIND_CONSTRUCTION_SITES);
+	return creep.room.find(FIND_CONSTRUCTION_SITES).length;
 };
 
 utils.anyWallsFallen = () => {
