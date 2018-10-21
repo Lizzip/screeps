@@ -28,10 +28,11 @@ const managePopulation = () => {
 	const maxDistanceHarvesters = 2;
 	const maxUpgraders = 1;
 	const maxBuilders = utils.numConstructionSites() ? 1 : 0;
-	const maxCarriers = 2;
+	const maxCarriers = 3;
 	const maxRepairers = 3;
 	const maxMiners = utils.nonFullContainerCount();
 	const maxBrutes = hostileCount();
+	let spawnQueue = "";
 	
     const harvesters = _.filter(Game.creeps, creep => creep.memory.role == 'harvester');
     const distanceHarvesters = _.filter(Game.creeps, creep => creep.memory.role == 'distHarvester');
@@ -42,14 +43,21 @@ const managePopulation = () => {
 	const repairers = _.filter(Game.creeps, creep => creep.memory.role == 'repairer');
 	const brutes = _.filter(Game.creeps, creep => creep.memory.role == 'brute');
 
-    if (harvesters.length < maxHarvesters) roleHarvester.spawn(spawner);
-    if (upgraders.length < maxUpgraders) roleUpgrader.spawn(spawner);
-    if (builders.length < maxBuilders) roleBuilder.spawn(spawner);
-    if (distanceHarvesters.length < maxDistanceHarvesters) roleHarvester.spawn(spawner, true);
-	if (miners.length < maxMiners) roleMiner.spawn(spawner);
-	if (carriers.length < maxCarriers) roleCarrier.spawn(spawner);
-	if (repairers.length < maxRepairers) roleRepairer.spawn(spawner);
-	if (brutes.length < maxBrutes) roleBrute.spawn(spawner);
+    if (harvesters.length < maxHarvesters){ roleHarvester.spawn(spawner); spawnQueue += "harvester ";}
+	if (carriers.length < maxCarriers){ roleCarrier.spawn(spawner); spawnQueue += "carrier ";}
+	if (miners.length < maxMiners){ roleMiner.spawn(spawner); spawnQueue += "miner ";}
+	if (distanceHarvesters.length < maxDistanceHarvesters){ roleHarvester.spawn(spawner, true); spawnQueue += "distHarvester ";}
+	
+    if (upgraders.length < maxUpgraders){ roleUpgrader.spawn(spawner); spawnQueue += "upgrader ";}
+    if (builders.length < maxBuilders){ roleBuilder.spawn(spawner); spawnQueue += "builder ";}
+	if (repairers.length < maxRepairers){ roleRepairer.spawn(spawner); spawnQueue += "repairer ";}
+	if (brutes.length < maxBrutes){ roleBrute.spawn(spawner); spawnQueue += "brute ";}
+	
+	if(Game.time % 30 == 1){
+		console.log(`Population: harvester:${harvesters.length}, carrier:${carriers.length}, miner:${miners.length}, distHarvester:${distanceHarvesters.length}, upgrader:${upgraders.length}, builder:${builders.length}, repairer:${repairers.length}, brute:${brutes.length}`);
+		
+		if(spawnQueue.length) console.log("Spawn queue:", spawnQueue);
+	}
 }
 
 const hostileCount = () => {

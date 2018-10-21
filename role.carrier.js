@@ -56,7 +56,7 @@ roleCarrier.run = creep => {
 roleCarrier.spawn = spawner => {
 	const role = 'carrier';
 	const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
-	
+
 	const classes = [
 		{
 			type: "big",
