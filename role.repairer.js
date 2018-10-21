@@ -1,4 +1,6 @@
 const utils = require('utils');
+const AI = require('creepAI');
+
 const roleRepairer = {};
 
 roleRepairer.run = creep => {
@@ -67,21 +69,7 @@ roleRepairer.run = creep => {
 		}
 	}
 	else {
-		const notEmptyContainerFilter = s => (s.structureType == STRUCTURE_CONTAINER) && (s.store[RESOURCE_ENERGY] > 0);
-		const containers = creep.room.find(FIND_STRUCTURES, {filter: notEmptyContainerFilter});
-		
-		if(containers.length){
-			if (creep.withdraw(containers[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-				creep.moveTo(containers[0], { visualizePathStyle: { stroke: '#FFE56D' } });
-			}
-		}
-		else {
-            const sources = creep.room.find(FIND_SOURCES);
-
-            if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources[0], { visualizePathStyle: { stroke: '#FFE56D' } });
-            }
-		}
+		AI.locateEnergySource(creep);
 	}	
 };
 
@@ -148,7 +136,7 @@ roleRepairer.spawn = spawner => {
 	
 	classes.some(c => {
 		if(c.cost <= currentEnergy){
-			let newName = `${utils.getRandomName()} - ${c.type} ${role}`;
+			let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
 			console.log('Spawning new Repairer: ' + newName);
 			spawner.spawnCreep(c.format, newName, { memory: { role: role } });
 			return true;

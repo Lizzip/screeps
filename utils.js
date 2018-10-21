@@ -27,8 +27,6 @@ utils.currentAvailableBuildEnergy = spawner => {
 	return totalEnergy;
 };
 
-utils.getAnyCreep = () => Game.creeps[Object.keys(Game.creeps)[0]];
-
 utils.nonFullContainerCount = () => {
 	const creep = utils.getAnyCreep();
 	const notFullContainerFilter = s => (s.structureType == STRUCTURE_CONTAINER) && (s.store[RESOURCE_ENERGY] < s.storeCapacity);
@@ -68,5 +66,6 @@ utils.getRandomName = () => {
 utils.getRoomName = () => 'W1N7';
 utils.getSpawnName = () => 'Spawnzilla_1';
 utils.creepExistsWithName = name => !!Game.creeps[name]
+utils.getAnyCreep = () => Game.creeps[Object.keys(Game.creeps)[0]];
 
 module.exports = utils;

@@ -5,6 +5,7 @@ const roleMiner = require('role.miner');
 const roleCarrier = require('role.carrier');
 const roleRepairer = require('role.repairer');
 const roleBrute = require('role.brute');
+
 const utils = require('utils');
 const turrets = require('turrets');
 
@@ -15,9 +16,9 @@ const room = Game.rooms[roomName];
 
 const managePopulation = () => {
 	const maxHarvesters = 0;
-	const maxDistanceHarvesters = 2;
+	const maxDistanceHarvesters = 1;
 	const maxUpgraders = 1;
-	const maxBuilders = utils.numConstructionSites() ? 1 : 0;
+	const maxBuilders = utils.numConstructionSites() ? 2 : 0;
 	const maxCarriers = 3;
 	const maxRepairers = 3;
 	const maxMiners = utils.nonFullContainerCount();
