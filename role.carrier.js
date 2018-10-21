@@ -1,3 +1,4 @@
+const utils = require('utils');
 const roleCarrier = {};
 
 roleCarrier.run = creep => {
@@ -53,9 +54,30 @@ roleCarrier.run = creep => {
 };
 
 roleCarrier.spawn = spawner => {
-	let newName = "Carrier" + Game.time;
-	console.log('Spawning new Carrier: ' + newName);
-	spawner.spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'carrier' } });
+	const role = 'carrier';
+	const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
+	
+	const classes = [
+		{
+			type: "big",
+			cost: 350,
+			format: [WORK, CARRY, CARRY, CARRY, MOVE, MOVE]
+		},
+		{
+			type: "basic",
+			cost: 200,
+			format: [WORK, CARRY, MOVE]
+		}
+	];
+	
+	classes.some(c => {
+		if(c.cost <= currentEnergy){
+			let newName = c.type + " " + role + Game.time;
+			console.log('Spawning new Carrier: ' + newName);
+			spawner.spawnCreep(c.format, newName, { memory: { role: role } });
+			return true;
+		}
+	});
 };
 
 module.exports = roleCarrier;

@@ -1,3 +1,4 @@
+const utils = require('utils');
 const roleMiner = {};
 
 roleMiner.run = creep => {
@@ -31,9 +32,30 @@ roleMiner.run = creep => {
 };
 
 roleMiner.spawn = spawner => {
-	let newName = 'Miner' + Game.time;
-	console.log('Spawning new Miner: ' + newName);
-	spawner.spawnCreep([WORK, WORK, MOVE], newName, { memory: { role: 'miner' } });
+	const role = 'miner';
+	const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
+	
+	const classes = [
+		{
+			type: "big",
+			cost: 450,
+			format: [WORK, WORK, WORK, WORK, MOVE]
+		},
+		{
+			type: "basic",
+			cost: 250,
+			format: [WORK, WORK, MOVE]
+		}
+	];
+	
+	classes.some(c => {
+		if(c.cost <= currentEnergy){
+			let newName = c.type + " " + role + Game.time;
+			console.log('Spawning new Miner: ' + newName);
+			spawner.spawnCreep(c.format, newName, { memory: { role: role } });
+			return true;
+		}
+	});
 };
 
 roleMiner.getPosOfAllOtherMiners = me => {

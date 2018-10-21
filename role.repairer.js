@@ -1,3 +1,4 @@
+const utils = require('utils');
 const roleRepairer = {};
 
 roleRepairer.run = creep => {
@@ -129,9 +130,30 @@ roleRepairer.getRoadsForRepair = (creep, maxHit) => {
 };
 
 roleRepairer.spawn = spawner => {
-	let newName = "Repair" + Game.time;
-	console.log('Spawning new Repairer: ' + newName);
-	spawner.spawnCreep([WORK, CARRY, CARRY, MOVE, MOVE], newName, { memory: { role: 'repairer' } });
+	const role = 'repairer';
+	const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
+	
+	const classes = [
+		{
+			type: "big",
+			cost: 400,
+			format: [WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE]
+		},
+		{
+			type: "basic",
+			cost: 200,
+			format: [WORK, CARRY, MOVE]
+		}
+	];
+	
+	classes.some(c => {
+		if(c.cost <= currentEnergy){
+			let newName = c.type + " " + role + Game.time;
+			console.log('Spawning new Repairer: ' + newName);
+			spawner.spawnCreep(c.format, newName, { memory: { role: role } });
+			return true;
+		}
+	});
 };
 
 module.exports = roleRepairer;

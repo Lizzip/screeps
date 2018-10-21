@@ -27,7 +27,7 @@ const managePopulation = () => {
 	const maxUpgraders = 1;
 	const maxBuilders = utils.numConstructionSites() ? 1 : 0;
 	const maxCarriers = 2;
-	const maxRepairers = 2;
+	const maxRepairers = 3;
 	const maxMiners = utils.nonFullContainerCount();
 	const maxBrutes = hostileCount();
 	
