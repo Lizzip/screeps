@@ -6,10 +6,12 @@ const roleCarrier = require('role.carrier');
 const roleRepairer = require('role.repairer');
 const roleBrute = require('role.brute');
 const utils = require('utils');
+const turrets = require('turrets');
 
 const roomName = 'W1N7';
 const spawnName = 'Spawnzilla_1';
 const spawner = Game.spawns[spawnName];
+const room = Game.rooms[roomName];
 
 
 const clear = () => {
@@ -51,14 +53,15 @@ const managePopulation = () => {
 }
 
 const hostileCount = () => {
-	return Game.rooms[roomName].find(FIND_HOSTILE_CREEPS).length;
+	return room.find(FIND_HOSTILE_CREEPS).length;
 };
 
 module.exports.loop = function() {
+	//Creep Control
     clear();
     managePopulation();
 	
-    if (spawner.spawning) {
+	if (spawner.spawning) {
         let spawningCreep = Game.creeps[spawner.spawning.name];
 		if(spawningCreep && spawningCreep.memory.role){
 			spawner.room.visual.text(
@@ -100,4 +103,9 @@ module.exports.loop = function() {
                 break;
         }
     }
+	
+	//Tower Control
+	turrets.buildIfIsDown(room);
+	turrets.defendRoom(room);
+    
 }
