@@ -8,20 +8,10 @@ const roleBrute = require('role.brute');
 const utils = require('utils');
 const turrets = require('turrets');
 
-const roomName = 'W1N7';
-const spawnName = 'Spawnzilla_1';
+const roomName = utils.getRoomName();
+const spawnName = utils.getSpawnName();
 const spawner = Game.spawns[spawnName];
 const room = Game.rooms[roomName];
-
-
-const clear = () => {
-    for (let name in Memory.creeps) {
-        if (!Game.creeps[name]) {
-            delete Memory.creeps[name];
-            console.log('RIP:', name);
-        }
-    }
-}
 
 const managePopulation = () => {
 	const maxHarvesters = 0;
@@ -66,7 +56,7 @@ const hostileCount = () => {
 
 module.exports.loop = function() {
 	//Creep Control
-    clear();
+    utils.clearExpiredCreeps();
     managePopulation();
 	
 	if (spawner.spawning) {

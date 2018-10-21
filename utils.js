@@ -41,4 +41,16 @@ utils.anyWallsFallen = () => {
 	return creep.room.find(FIND_STRUCTURES, {filter: filter}).length;
 };
 
+utils.clearExpiredCreeps = () => {
+    for (let name in Memory.creeps) {
+        if (!Game.creeps[name]) {
+            delete Memory.creeps[name];
+            console.log('RIP:', name);
+        }
+    }
+};
+
+utils.getRoomName = () => 'W1N7';
+utils.getSpawnName = () => 'Spawnzilla_1';
+
 module.exports = utils;
