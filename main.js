@@ -4,17 +4,13 @@ const roleBuilder = require('role.builder');
 const roleMiner = require('role.miner');
 const roleCarrier = require('role.carrier');
 const roleRepairer = require('role.repairer');
+const roleBrute = require('role.brute');
+const utils = require('utils');
 
+const roomName = 'W1N7';
 const spawnName = 'Spawnzilla_1';
 const spawner = Game.spawns[spawnName];
 
-const maxHarvesters = 0;
-const maxDistanceHarvesters = 0;
-const maxUpgraders = 0;
-const maxBuilders = 0;
-const maxMiners = 2;
-const maxCarriers = 4;
-const maxRepairers = 2;
 
 const clear = () => {
     for (let name in Memory.creeps) {
@@ -26,6 +22,15 @@ const clear = () => {
 }
 
 const managePopulation = () => {
+	const maxHarvesters = 0;
+	const maxDistanceHarvesters = 2;
+	const maxUpgraders = 1;
+	const maxBuilders = utils.numConstructionSites() ? 1 : 0;
+	const maxCarriers = 2;
+	const maxRepairers = 2;
+	const maxMiners = utils.nonFullContainerCount();
+	const maxBrutes = hostileCount();
+	
     const harvesters = _.filter(Game.creeps, creep => creep.memory.role == 'harvester');
     const distanceHarvesters = _.filter(Game.creeps, creep => creep.memory.role == 'distHarvester');
     const upgraders = _.filter(Game.creeps, creep => creep.memory.role == 'upgrader');
@@ -33,6 +38,7 @@ const managePopulation = () => {
 	const miners = _.filter(Game.creeps, creep => creep.memory.role == 'miner');
 	const carriers = _.filter(Game.creeps, creep => creep.memory.role == 'carrier');
 	const repairers = _.filter(Game.creeps, creep => creep.memory.role == 'repairer');
+	const brutes = _.filter(Game.creeps, creep => creep.memory.role == 'brute');
 
     if (harvesters.length < maxHarvesters) roleHarvester.spawn(spawner);
     if (upgraders.length < maxUpgraders) roleUpgrader.spawn(spawner);
@@ -41,19 +47,25 @@ const managePopulation = () => {
 	if (miners.length < maxMiners) roleMiner.spawn(spawner);
 	if (carriers.length < maxCarriers) roleCarrier.spawn(spawner);
 	if (repairers.length < maxRepairers) roleRepairer.spawn(spawner);
+	if (brutes.length < maxBrutes) roleBrute.spawn(spawner);
 }
+
+const hostileCount = () => {
+	return Game.rooms[roomName].find(FIND_HOSTILE_CREEPS).length;
+};
 
 module.exports.loop = function() {
     clear();
-
     managePopulation();
-
+	
     if (spawner.spawning) {
         let spawningCreep = Game.creeps[spawner.spawning.name];
-        spawner.room.visual.text(
-            '🛠️' + spawningCreep.memory.role,
-            spawner.pos.x + 1,
-            spawner.pos.y, { align: 'left', opacity: 0.8 });
+		if(spawningCreep && spawningCreep.memory.role){
+			spawner.room.visual.text(
+				'🛠️' + spawningCreep.memory.role,
+				spawner.pos.x + 1,
+				spawner.pos.y, { align: 'left', opacity: 0.8 });
+		}
     }
 
     for (const name in Game.creeps) {
@@ -81,6 +93,9 @@ module.exports.loop = function() {
 			case 'repairer':
                 roleRepairer.run(creep);
                 break;
+			case 'brute':
+				roleBrute.run(creep);
+				break;
             default:
                 break;
         }
