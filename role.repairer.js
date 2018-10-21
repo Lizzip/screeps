@@ -11,16 +11,23 @@ roleRepairer.run = creep => {
 	
 	if(creep.memory.repairing){
 		//Priority order:
-		// 1) Rampart
-		// 2) Wall < 3000
-		// 3) Road < 3000
-		// 4) Wall < 5000
-		// 5) Road
-		// 6) Wall
+		// 1) Container
+		// 2) Rampart < 25k
+		// 3) Wall < 3000
+		// 4) Road < 3000
+		// 5) Wall < 5000
+		// 6) Rampart
+		// 7) Road
+		// 8) Wall
 		
-		const ramparts = roleRepairer.getRampartsForRepair(creep);
-		let target = ramparts.length ? ramparts[0] : null;
+		const containers = roleRepairer.getContainersForRepair(creep);
+		let target = containers.length ? containers[0] : null;
 		let maxHitpoints = 3000;
+		
+		if(!target){
+			const ramparts = roleRepairer.getRampartsForRepair(creep, 25000);
+			target = ramparts.length ? ramparts[0] : null;
+		}
 		
 		if(!target){
 			const walls = roleRepairer.getWallsForRepair(creep, maxHitpoints);
@@ -37,6 +44,11 @@ roleRepairer.run = creep => {
 		if(!target){
 			const walls = roleRepairer.getWallsForRepair(creep, maxHitpoints);
 			target = walls.length ? walls[0] : null;
+		}
+		
+		if(!target){
+			const ramparts = roleRepairer.getRampartsForRepair(creep);
+			target = ramparts.length ? ramparts[0] : null;
 		}
 		
 		if(!target){
@@ -63,8 +75,21 @@ roleRepairer.run = creep => {
 	}	
 };
 
-roleRepairer.getRampartsForRepair = creep => {
-	const filter = s => (s.structureType == STRUCTURE_RAMPART && s.hits < s.hitsMax);
+roleRepairer.getContainersForRepair = creep => {
+	const filter = s => (s.structureType == STRUCTURE_CONTAINER && s.hits < s.hitsMax);
+	return creep.room.find(FIND_STRUCTURES, {filter: filter});
+};
+
+roleRepairer.getRampartsForRepair = (creep, maxHit) => {
+	let filter = null;
+	
+	if(maxHit){
+		filter = s => (s.structureType == STRUCTURE_RAMPART && s.hits < maxHit);
+	}
+	else {
+		filter = s => (s.structureType == STRUCTURE_RAMPART && s.hits < s.hitsMax);
+	}
+	
 	return creep.room.find(FIND_STRUCTURES, {filter: filter});
 };
 
@@ -97,7 +122,7 @@ roleRepairer.getRoadsForRepair = (creep, maxHit) => {
 roleRepairer.spawn = spawner => {
 	let newName = "Repair" + Game.time;
 	console.log('Spawning new Repairer: ' + newName);
-	spawner.spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'repairer' } });
+	spawner.spawnCreep([WORK, CARRY, CARRY, MOVE, MOVE], newName, { memory: { role: 'repairer' } });
 };
 
 module.exports = roleRepairer;
