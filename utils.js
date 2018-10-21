@@ -1,4 +1,11 @@
-const utils = {};
+const utils = {
+	names: ["Alice Holliday","Alice Michelle Earp","August Hamilton","Baron Samedi","Bass Reeves","Beth Gardner","Bethany","Big Bubba","Bobo Del Rey","Bryce Cooper","Bulshar Clootie",
+	"Calamity Jane","Carl","Champ Hardy","Charlie","Chrissy Nedley","Constance Clootie","Curtis McCready","Derek","Doc Holliday","Dr. Reggie","Willa Earp","Wynonna Earp","Edwin Earp",
+	"Eliza Shapiro","Ewan Allenbach","Fish","Gary Smith","Gretta Perley","Gus McCready","Nicole Haught","Hetty Tate","Hypnos","Jack of Knives","Jeremy Chetri","Jim Miller","John","Jolene",
+	"Jonas","Josiah Earp","Juan Carlo","Judge Cryderman","Kate","Kevin","Levi","Lou","Agent Lucado","Maeve Perley","Malcolm Ramaker","Marty","Marzaniok","Mattie Perley","Mercedes Gardner",
+	"Michelle Gibson","Mictian","One Armed Clint","Perry Crofte","Poppy","Porcelain Doll","Randy Nedley","Red","Revenants","Robert Malick","Robin Jett","Rosita Bustillos","Samuel Larson",
+	"Shae Pressman","Shopkeeper","Shorty","Stevie","The Widows","Theodore Roosevelt","Tucker Gardner","Ward Earp","Waverly Earp","Whiskey Jim","Wyatt Earp","Xavier Dolls"]
+};
 
 utils.maxPossibleBuildEnergy = () => {
 	const creep = utils.getAnyCreep();
@@ -20,9 +27,7 @@ utils.currentAvailableBuildEnergy = spawner => {
 	return totalEnergy;
 };
 
-utils.getAnyCreep = () => {
-	return Game.creeps[Object.keys(Game.creeps)[0]];
-};
+utils.getAnyCreep = () => Game.creeps[Object.keys(Game.creeps)[0]];
 
 utils.nonFullContainerCount = () => {
 	const creep = utils.getAnyCreep();
@@ -50,7 +55,18 @@ utils.clearExpiredCreeps = () => {
     }
 };
 
+utils.getRandomName = () => {
+	let name = utils.names[ Math.floor(Math.random()*utils.names.length)];
+	
+	while(utils.creepExistsWithName(name)){
+		name = utils.names[ Math.floor(Math.random()*utils.names.length)];
+	}
+	
+	return name;
+}
+
 utils.getRoomName = () => 'W1N7';
 utils.getSpawnName = () => 'Spawnzilla_1';
+utils.creepExistsWithName = name => !!Game.creeps[name]
 
 module.exports = utils;

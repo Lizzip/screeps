@@ -76,7 +76,7 @@ roleBuilder.spawn = spawner => {
 	
 	classes.some(c => {
 		if(c.cost <= currentEnergy){
-			let newName = c.type + " " + role + Game.time;
+			let newName = `${utils.getRandomName()} - ${c.type} ${role}`;
 			console.log('Spawning new 5H: ' + newName);
 			spawner.spawnCreep(c.format, newName, { memory: { role: role } });
 			return true;

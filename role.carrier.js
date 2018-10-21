@@ -23,8 +23,13 @@ roleCarrier.run = creep => {
 			}
 		}
 		else {
-			const notFullContainerFilter = s => (s.structureType == STRUCTURE_CONTAINER) && (s.store[RESOURCE_ENERGY] < s.storeCapacity);
-			const containers = creep.room.find(FIND_STRUCTURES, {filter: notFullContainerFilter});
+			const notEmptyContainerFilter = s => (s.structureType == STRUCTURE_CONTAINER) && (s.store[RESOURCE_ENERGY] > 0);
+			const containers = creep.room.find(FIND_STRUCTURES, {filter: notEmptyContainerFilter});
+			
+			//Sort containers by store (creep picks from container holding most energy)
+			if(containers.length > 1){
+				containers.sort((c1,c2) => c1.store[RESOURCE_ENERGY] < c2.store[RESOURCE_ENERGY]);
+			}
 			
 			if (creep.withdraw(containers[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
 				creep.moveTo(containers[0], { visualizePathStyle: { stroke: '#ffffff' } });
@@ -32,13 +37,8 @@ roleCarrier.run = creep => {
 		}
 	}
 	else {
-		var targets = creep.room.find(FIND_STRUCTURES, {
-			filter: (structure) => {
-				return (structure.structureType == STRUCTURE_EXTENSION ||
-					structure.structureType == STRUCTURE_SPAWN ||
-					structure.structureType == STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
-			}
-		});
+		const targetsFilter = s => (s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_SPAWN || s.structureType == STRUCTURE_TOWER) && s.energy < s.energyCapacity;
+		const targets = creep.room.find(FIND_STRUCTURES, {filter: targetsFilter});
 		
 		if (targets.length > 0) {
 			if (creep.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
@@ -72,7 +72,7 @@ roleCarrier.spawn = spawner => {
 	
 	classes.some(c => {
 		if(c.cost <= currentEnergy){
-			let newName = c.type + " " + role + Game.time;
+			let newName = `${utils.getRandomName()} - ${c.type} ${role}`;
 			console.log('Spawning new Carrier: ' + newName);
 			spawner.spawnCreep(c.format, newName, { memory: { role: role } });
 			return true;

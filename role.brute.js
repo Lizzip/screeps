@@ -49,7 +49,7 @@ roleBrute.spawn = spawner => {
 	
 	classes.some(c => {
 		if(c.cost <= currentEnergy){
-			let newName = c.type + " " + role + Game.time;
+			let newName = `${utils.getRandomName()} - ${c.type} ${role}`;
 			
 			//Only enable melee types for now
 			if(c.type == 'horse') return false;
