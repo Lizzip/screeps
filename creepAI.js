@@ -2,7 +2,7 @@ const utils = require('utils');
 
 const AI = {};
 
-AI.locateEnergySource = creep => {
+AI.locateEnergySource = creep => {	
     // Priority Order
     // 1) Dropped resource with more resource than the creep can carry
     // 2) Closest container with more resource than the creep can carry
@@ -89,6 +89,8 @@ AI.hasWorkPart = creep => {
 };
 
 AI.provideEnergyToStructure = creep => {
+	//TODO: Assign creep to structure
+	
     // Priority Order
     // 1) Spawner
     // 2) Tower < 50%

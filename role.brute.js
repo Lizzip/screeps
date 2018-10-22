@@ -11,7 +11,7 @@ const roleBrute = {
         },*/
         {
 			type: "biggerMelee",
-			format: [TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, ATTACK, ATTACK]
+			format: [TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, ATTACK, ATTACK, MOVE]
 		},
 		{
             type: "melee",
