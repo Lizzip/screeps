@@ -15,11 +15,13 @@ const spawner = Game.spawns[spawnName];
 const room = Game.rooms[roomName];
 
 const managePopulation = () => {
-	const maxHarvesters = 0;
-	const maxDistanceHarvesters = 1;
-	const maxUpgraders = 1;
+	const controllerLevel = utils.getControllerLevel();
+
+	const maxHarvesters = (controllerLevel < 2) ? 2 : 0;
+	const maxDistanceHarvesters = (controllerLevel < 2) ? 2 : 1;
+	const maxUpgraders = 3;
 	const maxBuilders = utils.numConstructionSites() ? 2 : 0;
-	const maxCarriers = 3;
+	const maxCarriers = 2;
 	const maxRepairers = 3;
 	const maxMiners = utils.nonFullContainerCount();
 	const maxBrutes = hostileCount();

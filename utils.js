@@ -7,6 +7,13 @@ const utils = {
 	"Shae Pressman","Shopkeeper","Shorty","Stevie","The Widows","Theodore Roosevelt","Tucker Gardner","Ward Earp","Waverly Earp","Whiskey Jim","Wyatt Earp","Xavier Dolls"]
 };
 
+utils.getControllerLevel = () => {
+	const creep = utils.getAnyCreep();
+	const filter = s => s.structureType == STRUCTURE_CONTROLLER;
+	const controller = creep.room.find(FIND_STRUCTURES, {filter: filter})[0];
+	return controller.level;
+};
+
 utils.maxPossibleBuildEnergy = () => {
 	const creep = utils.getAnyCreep();
 	const spawnCapacity = 300;
