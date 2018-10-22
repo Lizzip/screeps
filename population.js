@@ -35,19 +35,17 @@ population.updateTargetPopulation = () => {
 };
 
 population.outputPopulations = () => {
-    if (Game.time % 60 == 1) {
-        let targetPop = "Target Population:  ";
-        let currentPop = "Current Population: ";
-        const keys = Object.keys(population.all);
+    let targetPop = "Target Population:  ";
+    let currentPop = "Current Population: ";
+    const keys = Object.keys(population.all);
 
-        keys.forEach(k => {
-            targetPop += `${k}:${population.all[k].t}, `;
-            currentPop += `${k}:${population.all[k].e}, `;
-        });
+    keys.forEach(k => {
+        targetPop += `${k}:${population.all[k].t}, `;
+        currentPop += `${k}:${population.all[k].e}, `;
+    });
 
-        console.log(targetPop);
-        console.log(currentPop);
-    }
+    console.log(targetPop);
+    console.log(currentPop);
 };
 
 population.getExistingPopulation = () => {

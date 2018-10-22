@@ -20,8 +20,11 @@ module.exports.loop = function() {
     pop.clearExpiredCreeps();
     pop.updateTargetPopulation();
     pop.getExistingPopulation();
-    pop.outputPopulations();
     pop.managePopulation();
+
+    if (Game.time % 60 == 1) {
+        pop.outputPopulations();
+    }
 
     //Creep Control
     for (const name in Game.creeps) {
