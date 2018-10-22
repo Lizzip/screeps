@@ -62,14 +62,19 @@ roleRepairer.run = creep => {
         //   3) Road
         //   4) Wall
 
-        const containers = roleRepairer.getContainersForRepair(creep);
-        let target = containers.length ? containers[0] : null;
+        if (utils.inPanicMode()) {
+            creep.say("PANICKING!");
+            AI.provideEnergyToStructure(creep);
+        } else {
+            const containers = roleRepairer.getContainersForRepair(creep);
+            let target = containers.length ? containers[0] : null;
 
-        if (!target) target = roleRepairer.getNextTarget(creep);
+            if (!target) target = roleRepairer.getNextTarget(creep);
 
-        if (target) {
-            if (creep.repair(target) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target, { visualizePathStyle: { stroke: '#00ff00' } });
+            if (target) {
+                if (creep.repair(target) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target, { visualizePathStyle: { stroke: '#00ff00' } });
+                }
             }
         }
     } else {
