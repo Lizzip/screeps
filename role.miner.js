@@ -1,7 +1,12 @@
 const utils = require('utils');
 
 const roleMiner = {
-    classes: [{
+    classes: [
+		{
+			type: "bigger",
+			format: [WORK, WORK, WORK, WORK, WORK, WORK, MOVE, MOVE]
+		},
+		{
             type: "big",
             format: [WORK, WORK, WORK, WORK, MOVE]
         },

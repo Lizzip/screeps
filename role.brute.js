@@ -10,6 +10,10 @@ const roleBrute = {
             format: [MOVE, MOVE, ATTACK, RANGED_ATTACK]
         },*/
         {
+			type: "biggerMelee",
+			format: [TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, ATTACK, ATTACK]
+		},
+		{
             type: "melee",
             format: [TOUGH, MOVE, MOVE, ATTACK]
         }

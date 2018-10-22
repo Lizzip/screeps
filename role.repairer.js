@@ -2,7 +2,12 @@ const utils = require('utils');
 const AI = require('creepAI');
 
 const roleRepairer = {
-    classes: [{
+    classes: [
+		{
+			type: "bigger",
+			format: [WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE]
+		},
+		{
             type: "big",
             format: [WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE]
         },
