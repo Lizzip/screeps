@@ -1,3 +1,5 @@
+const utils = require('utils');
+
 const roleHarvester = {};
 
 roleHarvester.run = (creep, distance) => {
@@ -39,17 +41,12 @@ roleHarvester.run = (creep, distance) => {
     }
 };
 
-roleHarvester.spawn = (spawner, distance) => {
-    if (!distance) {
-        let newName = 'Harvester' + Game.time;
-        if (spawner.spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'harvester' } }) == OK) {
-            console.log('Spawning new Wurzels: ' + newName);
-        }
-    } else {
-        let newName = 'DistHarvester' + Game.time;
-        if (spawner.spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'distHarvester' } }) == OK) {
-            console.log('Spawning new Distance Wurzels: ' + newName);
-        }
+roleHarvester.spawn = (spawner, role) => {
+    role = role || 'harvester';
+
+    let newName = `${role}: ${utils.getRandomName()}`;
+    if (spawner.spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: role } }) == OK) {
+        console.log('Spawning new Wurzels: ' + newName);
     }
 };
 
