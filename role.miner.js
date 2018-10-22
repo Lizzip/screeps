@@ -41,24 +41,6 @@ roleMiner.run = creep => {
     }
 };
 
-roleMiner.spawn = spawner => {
-    const role = 'miner';
-    const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
-
-    roleMiner.classes.some(c => {
-		const cost = utils.calculateSpawnCost(c.format);
-
-        if (cost <= currentEnergy) {
-            let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
-
-            if (spawner.spawnCreep(c.format, newName, { memory: { role: role } }) == OK) {
-                console.log('Spawning new Miner: ' + newName);
-            }
-            return true;
-        }
-    });
-};
-
 roleMiner.getPosOfAllOtherMiners = me => {
     const miners = [];
     for (let i in Game.creeps) {

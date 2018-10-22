@@ -33,22 +33,4 @@ roleUpgrader.run = creep => {
     }
 };
 
-roleUpgrader.spawn = spawner => {
-    const role = 'upgrader';
-    const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
-
-    roleUpgrader.classes.some(c => {
-		const cost = utils.calculateSpawnCost(c.format);
-		
-        if (cost <= currentEnergy) {
-            let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
-
-            if (spawner.spawnCreep(c.format, newName, { memory: { role: role } }) == OK) {
-                console.log('Spawning new Beyonce: ' + newName);
-            }
-            return true;
-        }
-    });
-};
-
 module.exports = roleUpgrader;

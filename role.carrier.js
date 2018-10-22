@@ -36,22 +36,4 @@ roleCarrier.run = creep => {
     }
 };
 
-roleCarrier.spawn = spawner => {
-    const role = 'carrier';
-    const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
-
-    roleCarrier.classes.some(c => {
-		const cost = utils.calculateSpawnCost(c.format);
-		
-        if (cost <= currentEnergy) {
-            let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
-
-            if (spawner.spawnCreep(c.format, newName, { memory: { role: role } }) == OK) {
-                console.log('Spawning new Carrier: ' + newName);
-            }
-            return true;
-        }
-    });
-};
-
 module.exports = roleCarrier;

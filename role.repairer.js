@@ -121,22 +121,4 @@ roleRepairer.getRoadsForRepair = (creep, maxHit) => {
     return creep.room.find(FIND_STRUCTURES, { filter: filter });
 };
 
-roleRepairer.spawn = spawner => {
-    const role = 'repairer';
-    const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
-
-    roleRepairer.classes.some(c => {
-		const cost = utils.calculateSpawnCost(c.format);
-		
-        if (cost <= currentEnergy) {
-            let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
-
-            if (spawner.spawnCreep(c.format, newName, { memory: { role: role } }) == OK) {
-                console.log('Spawning new Repairer: ' + newName);
-            }
-            return true;
-        }
-    });
-};
-
 module.exports = roleRepairer;

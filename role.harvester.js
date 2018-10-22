@@ -38,22 +38,4 @@ roleHarvester.run = (creep, distance) => {
     }
 };
 
-roleHarvester.spawn = (spawner, role) => {
-	role = role || 'harvester';
-    const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
-
-    roleHarvester.classes.some(c => {
-		const cost = utils.calculateSpawnCost(c.format);
-		
-        if (cost <= currentEnergy) {
-            let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
-
-            if (spawner.spawnCreep(c.format, newName, { memory: { role: role } }) == OK) {
-                console.log('Spawning new Wurzels: ' + newName);
-            }
-            return true;
-        }
-    });
-};
-
 module.exports = roleHarvester;

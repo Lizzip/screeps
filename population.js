@@ -31,7 +31,7 @@ population.updateTargetPopulation = () => {
     population.all.carrier.t = 3;
     population.all.repairer.t = 2;
     population.all.miner.t = utils.nonFullContainerCount();
-    population.all.brute.t = utils.hostileCount();
+    population.all.brute.t = utils.anyWallsFallen() ? utils.hostileCount() : 0;
 };
 
 population.outputPopulations = () => {
@@ -75,12 +75,26 @@ population.managePopulation = () => {
 population.spawn = role => {
     const spawnName = utils.getSpawnName();
     const spawner = Game.spawns[spawnName];
+	const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
+	const script = population.all[role].r;
+	const classes = script.classes;
 
-    if (Game.time % 10 == 1) {
+	if (Game.time % 10 == 1) {
         console.log("Spawn", role, "next");
     }
 
-    population.all[role].r.spawn(spawner, role);
+    classes.some(c => {
+		const cost = utils.calculateSpawnCost(c.format);
+		
+        if (cost <= currentEnergy) {
+            let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
+
+            if (spawner.spawnCreep(c.format, newName, { memory: { role: role } }) == OK) {
+                console.log('Spawning ' + newName);
+            }
+            return true;
+        }
+    });
 };
 
 population.clearExpiredCreeps = () => {

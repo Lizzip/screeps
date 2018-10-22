@@ -62,21 +62,4 @@ roleBuilder.build = (creep, target) => {
     }
 };
 
-roleBuilder.spawn = spawner => {
-    const role = 'builder';
-    const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
-
-    roleBuilder.classes.some(c => {
-		const cost = utils.calculateSpawnCost(c.format);
-		
-        if (cost <= currentEnergy) {
-            let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
-            if (spawner.spawnCreep(c.format, newName, { memory: { role: role } }) == OK) {
-                console.log('Spawning new 5H: ' + newName);
-            }
-            return true;
-        }
-    });
-};
-
 module.exports = roleBuilder;
