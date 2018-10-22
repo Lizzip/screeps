@@ -1,3 +1,7 @@
+const utils = require('utils');
+const turrets = require('turrets');
+const pop = require('population');
+
 const roleHarvester = require('role.harvester');
 const roleUpgrader = require('role.upgrader');
 const roleBuilder = require('role.builder');
@@ -6,9 +10,16 @@ const roleCarrier = require('role.carrier');
 const roleRepairer = require('role.repairer');
 const roleBrute = require('role.brute');
 
-const utils = require('utils');
-const turrets = require('turrets');
-const pop = require('population');
+const roles = {
+	brute: roleBrute,
+	harvester: roleHarvester,
+	distHarvester: roleHarvester,
+	carrier: roleCarrier,
+	upgrader: roleUpgrader,
+	miner: roleMiner,
+	builder: roleBuilder,
+	repairer: roleRepairer
+};
 
 const roomName = utils.getRoomName();
 const spawnName = utils.getSpawnName();
@@ -29,35 +40,8 @@ module.exports.loop = function() {
     //Creep Control
     for (const name in Game.creeps) {
         let creep = Game.creeps[name];
-
-        switch (creep.memory.role) {
-            case 'harvester':
-                roleHarvester.run(creep);
-                break;
-            case 'distHarvester':
-                roleHarvester.run(creep, true);
-                break;
-            case 'upgrader':
-                roleUpgrader.run(creep);
-                break;
-            case 'builder':
-                roleBuilder.run(creep);
-                break;
-            case 'miner':
-                roleMiner.run(creep);
-                break;
-            case 'carrier':
-                roleCarrier.run(creep);
-                break;
-            case 'repairer':
-                roleRepairer.run(creep);
-                break;
-            case 'brute':
-                roleBrute.run(creep);
-                break;
-            default:
-                break;
-        }
+		const isDistHarvester = (creep.memory.role == 'distHarvester') ? true : null;
+		roles[creep.memory.role].run(creep, isDistHarvester);
     }
 
     //Tower Control
@@ -74,5 +58,4 @@ module.exports.loop = function() {
                 spawner.pos.y, { align: 'left', opacity: 0.8 });
         }
     }
-
 }
