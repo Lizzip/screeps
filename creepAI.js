@@ -95,7 +95,6 @@ AI.provideEnergyToStructure = creep => {
     // 3) Extension
     // 4) Tower
 
-
     let filter = s => s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity;
     let targets = creep.room.find(FIND_STRUCTURES, { filter: filter });
     let target = null;

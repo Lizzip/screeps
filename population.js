@@ -31,30 +31,27 @@ const population = {
     }
 };
 
-population.updatePopulation = () => {
+population.updateTargetPopulation = () => {
     const controllerLevel = utils.getControllerLevel();
 
     population.target.harvesters = (controllerLevel < 2) ? 2 : 0;
     population.target.distHarvesters = (controllerLevel < 2) ? 2 : 1;
-    population.target.upgraders = 3;
-    population.target.builders = utils.numConstructionSites() ? 3 : 0;
+    population.target.upgraders = 2;
+    population.target.builders = utils.numConstructionSites() ? 1 : 0;
     population.target.carriers = 2;
-    population.target.repairers = 3;
+    population.target.repairers = 2;
     population.target.miners = utils.nonFullContainerCount();
     population.target.brutes = utils.hostileCount();
-
-    population.getPopulation();
-    population.outputPopulation();
 };
 
-population.outputPopulation = () => {
+population.outputPopulations = () => {
     if (Game.time % 30 == 1) {
-        console.log(`Ideal Population:   harvester:${population.target.harvesters}, distHarvester:${population.target.distHarvesters}, carrier:${population.target.carriers}, miner:${population.target.miners}, upgrader:${population.target.upgraders}, builder:${population.target.builders}, repairer:${population.target.repairers}, brute:${population.target.brutes}`);
+        console.log(`Target Population:  harvester:${population.target.harvesters}, distHarvester:${population.target.distHarvesters}, carrier:${population.target.carriers}, miner:${population.target.miners}, upgrader:${population.target.upgraders}, builder:${population.target.builders}, repairer:${population.target.repairers}, brute:${population.target.brutes}`);
         console.log(`Current Population: harvester:${population.existing.harvesters}, distHarvester:${population.existing.distHarvesters}, carrier:${population.existing.carriers}, miner:${population.existing.miners}, upgrader:${population.existing.upgraders}, builder:${population.existing.builders}, repairer:${population.existing.repairers}, brute:${population.existing.brutes}`);
     }
 };
 
-population.getPopulation = () => {
+population.getExistingPopulation = () => {
     population.existing.harvesters = _.filter(Game.creeps, creep => creep.memory.role == 'harvester').length;
     population.existing.distHarvesters = _.filter(Game.creeps, creep => creep.memory.role == 'distHarvester').length;
     population.existing.upgraders = _.filter(Game.creeps, creep => creep.memory.role == 'upgrader').length;
@@ -88,7 +85,7 @@ population.spawn = role => {
     const spawnName = utils.getSpawnName();
     const spawner = Game.spawns[spawnName];
 
-    if (Game.time % 3 == 1) {
+    if (Game.time % 10 == 1) {
         console.log("Spawn", role, "next");
     }
 
@@ -97,7 +94,7 @@ population.spawn = role => {
             roleHarvester.spawn(spawner);
             break;
         case 'distHarvester':
-            roleHarvester.spawn(spawner);
+            roleHarvester.spawn(spawner, true);
             break;
         case 'upgrader':
             roleUpgrader.spawn(spawner);

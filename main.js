@@ -18,7 +18,9 @@ const room = Game.rooms[roomName];
 module.exports.loop = function() {
     //Population Control
     pop.clearExpiredCreeps();
-    pop.updatePopulation();
+    pop.updateTargetPopulation();
+    pop.getExistingPopulation();
+    pop.outputPopulations();
     pop.managePopulation();
 
     //Creep Control
