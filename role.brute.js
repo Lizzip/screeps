@@ -3,17 +3,14 @@ const utils = require('utils');
 const roleBrute = {
     classes: [{
             type: "horse",
-            cost: 450,
             format: [TOUGH, TOUGH, MOVE, MOVE, RANGED_ATTACK, MOVE, MOVE, ATTACK]
         },
         {
             type: "archer",
-            cost: 330,
             format: [MOVE, MOVE, ATTACK, RANGED_ATTACK]
         },
         {
             type: "melee",
-            cost: 190,
             format: [TOUGH, MOVE, MOVE, ATTACK]
         }
     ]
@@ -23,7 +20,6 @@ roleBrute.run = creep => {
     let target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
 
     if (target) {
-        console.log(creep.attack(target));
         if (creep.attack(target) == ERR_NOT_IN_RANGE) {
             creep.moveTo(target, { visualizePathStyle: { stroke: '#ff0000' } });
         }
@@ -46,7 +42,9 @@ roleBrute.spawn = spawner => {
     const wallsDown = utils.anyWallsFallen();
 
     roleBrute.classes.some(c => {
-        if (c.cost <= currentEnergy) {
+		const cost = utils.calculateSpawnCost(c.format);
+		
+        if (cost <= currentEnergy) {
             let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
 
             //Only enable melee types for now

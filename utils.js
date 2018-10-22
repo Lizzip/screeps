@@ -5,7 +5,27 @@ const utils = {
         "Jonas", "Josiah Earp", "Juan Carlo", "Judge Cryderman", "Kate", "Kevin", "Levi", "Lou", "Agent Lucado", "Maeve Perley", "Malcolm Ramaker", "Marty", "Marzaniok", "Mattie Perley", "Mercedes Gardner",
         "Michelle Gibson", "Mictian", "One Armed Clint", "Perry Crofte", "Poppy", "Porcelain Doll", "Randy Nedley", "Red", "Revenants", "Robert Malick", "Robin Jett", "Rosita Bustillos", "Samuel Larson",
         "Shae Pressman", "Shopkeeper", "Shorty", "Stevie", "The Widows", "Theodore Roosevelt", "Tucker Gardner", "Ward Earp", "Waverly Earp", "Whiskey Jim", "Wyatt Earp", "Xavier Dolls"
-    ]
+    ],
+	costs: {
+		move: 50,
+		work: 100,
+		carry: 50,
+		attack: 80,
+		ranged_attack: 150,
+		heal: 250,
+		claim: 600,
+		tough: 10
+	}
+};
+
+utils.calculateSpawnCost = bodyArray => {
+	let cost = 0;
+	bodyArray.forEach(part => {
+		if(utils.costs.hasOwnProperty(part)){
+			cost += utils.costs[part];
+		}
+	});
+	return cost;
 };
 
 utils.hostileCount = () => {

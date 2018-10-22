@@ -4,12 +4,10 @@ const AI = require('creepAI');
 const roleUpgrader = {
     classes: [{
             type: "big",
-            cost: 400,
             format: [WORK, WORK, CARRY, CARRY, MOVE, MOVE]
         },
         {
             type: "basic",
-            cost: 200,
             format: [WORK, CARRY, MOVE]
         }
     ]
@@ -23,6 +21,7 @@ roleUpgrader.run = creep => {
 
     if (!creep.memory.upgrading && creep.carry.energy == creep.carryCapacity) {
         creep.memory.upgrading = true;
+		creep.say("upgrade");
     }
 
     if (!creep.memory.upgrading) {
@@ -39,7 +38,9 @@ roleUpgrader.spawn = spawner => {
     const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
 
     roleUpgrader.classes.some(c => {
-        if (c.cost <= currentEnergy) {
+		const cost = utils.calculateSpawnCost(c.format);
+		
+        if (cost <= currentEnergy) {
             let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
 
             if (spawner.spawnCreep(c.format, newName, { memory: { role: role } }) == OK) {

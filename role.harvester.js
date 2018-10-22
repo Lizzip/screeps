@@ -12,6 +12,7 @@ roleHarvester.run = (creep, distance) => {
 
     if (creep.memory.harvesting && creep.carry.energy == creep.carryCapacity) {
         creep.memory.harvesting = false;
+		creep.say("offload");
     }
 
     if (creep.memory.harvesting) {

@@ -4,12 +4,10 @@ const AI = require('creepAI');
 const roleCarrier = {
     classes: [{
             type: "big",
-            cost: 350,
             format: [WORK, CARRY, CARRY, CARRY, MOVE, MOVE]
         },
         {
             type: "basic",
-            cost: 200,
             format: [WORK, CARRY, MOVE]
         }
     ]
@@ -35,20 +33,6 @@ roleCarrier.run = creep => {
                 creep.moveTo(creep.room.controller);
             }
         }
-        /*
-        const targetsFilter = s => (s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_SPAWN || s.structureType == STRUCTURE_TOWER) && s.energy < s.energyCapacity;
-        const targets = creep.room.find(FIND_STRUCTURES, {filter: targetsFilter});
-		
-        if (targets.length > 0) {
-        	if (creep.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-        		creep.moveTo(targets[0], { visualizePathStyle: { stroke: '#ffffff' } });
-        	}
-        } else {
-        	//If we can't provide for anything then be an upgrader
-        	if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-        		creep.moveTo(creep.room.controller);
-        	}
-        }*/
     }
 };
 
@@ -57,7 +41,9 @@ roleCarrier.spawn = spawner => {
     const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
 
     roleCarrier.classes.some(c => {
-        if (c.cost <= currentEnergy) {
+		const cost = utils.calculateSpawnCost(c.format);
+		
+        if (cost <= currentEnergy) {
             let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
 
             if (spawner.spawnCreep(c.format, newName, { memory: { role: role } }) == OK) {

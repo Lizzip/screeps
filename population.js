@@ -27,7 +27,7 @@ population.updateTargetPopulation = () => {
     population.all.harvester.t = (controllerLevel < 2) ? 2 : 0;
     population.all.distHarvester.t = (controllerLevel < 2) ? 2 : 1;
     population.all.upgrader.t = 3;
-    population.all.builder.t = utils.numConstructionSites() ? 2 : 0;
+    population.all.builder.t = utils.numConstructionSites() ? Math.min(3, utils.numConstructionSites() + 1) : 0;
     population.all.carrier.t = 3;
     population.all.repairer.t = 2;
     population.all.miner.t = utils.nonFullContainerCount();

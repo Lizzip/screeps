@@ -3,12 +3,10 @@ const utils = require('utils');
 const roleMiner = {
     classes: [{
             type: "big",
-            cost: 450,
             format: [WORK, WORK, WORK, WORK, MOVE]
         },
         {
             type: "basic",
-            cost: 250,
             format: [WORK, WORK, MOVE]
         }
     ]
@@ -48,7 +46,9 @@ roleMiner.spawn = spawner => {
     const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
 
     roleMiner.classes.some(c => {
-        if (c.cost <= currentEnergy) {
+		const cost = utils.calculateSpawnCost(c.format);
+
+        if (cost <= currentEnergy) {
             let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
 
             if (spawner.spawnCreep(c.format, newName, { memory: { role: role } }) == OK) {
