@@ -9,6 +9,10 @@ const utils = {
 };
 
 utils.inPanicMode = () => {
+    const minRoomEnergy = 500;
+    const spawnName = utils.getSpawnName();
+    if (utils.currentAvailableBuildEnergy(Game.spawns[spawnName]) > minRoomEnergy) return false;
+
     //If there are 0 carriers then we are in panic mode
     //Every builder and repairer temporarily acts as a carrier/harvester
     const keys = Object.keys(Game.creeps);

@@ -50,8 +50,10 @@ roleMiner.spawn = spawner => {
     roleMiner.classes.some(c => {
         if (c.cost <= currentEnergy) {
             let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
-            console.log('Spawning new Miner: ' + newName);
-            spawner.spawnCreep(c.format, newName, { memory: { role: role } });
+
+            if (spawner.spawnCreep(c.format, newName, { memory: { role: role } }) == OK) {
+                console.log('Spawning new Miner: ' + newName);
+            }
             return true;
         }
     });

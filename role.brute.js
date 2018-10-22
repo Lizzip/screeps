@@ -54,8 +54,9 @@ roleBrute.spawn = spawner => {
             if (c.type == 'archer' /* && wallsDown*/ ) return false;
             if (c.type == 'melee' && !wallsDown) return false;
 
-            console.log('Spawning new Brutus: ' + newName);
-            spawner.spawnCreep(c.format, newName, { memory: { role: role } });
+            if (spawner.spawnCreep(c.format, newName, { memory: { role: role } }) == OK) {
+                console.log('Spawning new Brutus: ' + newName);
+            }
             return true;
         }
     });

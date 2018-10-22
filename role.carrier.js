@@ -59,8 +59,10 @@ roleCarrier.spawn = spawner => {
     roleCarrier.classes.some(c => {
         if (c.cost <= currentEnergy) {
             let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
-            console.log('Spawning new Carrier: ' + newName);
-            spawner.spawnCreep(c.format, newName, { memory: { role: role } });
+
+            if (spawner.spawnCreep(c.format, newName, { memory: { role: role } }) == OK) {
+                console.log('Spawning new Carrier: ' + newName);
+            }
             return true;
         }
     });
