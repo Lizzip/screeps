@@ -1,6 +1,14 @@
 const utils = require('utils');
+const AI = require('creepAI');
 
-const roleHarvester = {};
+const roleHarvester = {
+	classes: [
+        {
+            type: "basic",
+            format: [WORK, CARRY, MOVE]
+        }
+    ]
+};
 
 roleHarvester.run = (creep, distance) => {
     const focus = distance ? 1 : 0;
@@ -16,24 +24,12 @@ roleHarvester.run = (creep, distance) => {
     }
 
     if (creep.memory.harvesting) {
-        var sources = creep.room.find(FIND_SOURCES);
+        const sources = creep.room.find(FIND_SOURCES);
         if (creep.harvest(sources[focus]) == ERR_NOT_IN_RANGE) {
             creep.moveTo(sources[focus], { visualizePathStyle: { stroke: '#FFE56D' } });
         }
     } else {
-        var targets = creep.room.find(FIND_STRUCTURES, {
-            filter: (structure) => {
-                return (structure.structureType == STRUCTURE_EXTENSION ||
-                    structure.structureType == STRUCTURE_SPAWN ||
-                    structure.structureType == STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
-            }
-        });
-        if (targets.length > 0) {
-
-            if (creep.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(targets[0], { visualizePathStyle: { stroke: '#ff0000' } });
-            }
-        } else {
+		if (!AI.provideEnergyToStructure(creep)) {
             //If we can't provide for anything then be an upgrader
             if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(creep.room.controller);
@@ -43,12 +39,21 @@ roleHarvester.run = (creep, distance) => {
 };
 
 roleHarvester.spawn = (spawner, role) => {
-    role = role || 'harvester';
+	role = role || 'harvester';
+    const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
 
-    let newName = `${role}: ${utils.getRandomName()}`;
-    if (spawner.spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: role } }) == OK) {
-        console.log('Spawning new Wurzels: ' + newName);
-    }
+    roleHarvester.classes.some(c => {
+		const cost = utils.calculateSpawnCost(c.format);
+		
+        if (cost <= currentEnergy) {
+            let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
+
+            if (spawner.spawnCreep(c.format, newName, { memory: { role: role } }) == OK) {
+                console.log('Spawning new Wurzels: ' + newName);
+            }
+            return true;
+        }
+    });
 };
 
 module.exports = roleHarvester;
