@@ -45,7 +45,9 @@ const managePopulation = () => {
 	if (brutes.length < maxBrutes) roleBrute.spawn(spawner);
 	
 	if(Game.time % 30 == 1){
-		console.log(`Population: harvester:${harvesters.length}, distHarvester:${distanceHarvesters.length}, carrier:${carriers.length}, miner:${miners.length}, upgrader:${upgraders.length}, builder:${builders.length}, repairer:${repairers.length}, brute:${brutes.length}`);
+		console.log(`Ideal Population:   harvester:${maxHarvesters}, distHarvester:${maxDistanceHarvesters}, carrier:${maxCarriers}, miner:${maxMiners}, upgrader:${maxUpgraders}, builder:${maxBuilders}, repairer:${maxRepairers}, brute:${maxBrutes}`);
+		
+		console.log(`Current Population: harvester:${harvesters.length}, distHarvester:${distanceHarvesters.length}, carrier:${carriers.length}, miner:${miners.length}, upgrader:${upgraders.length}, builder:${builders.length}, repairer:${repairers.length}, brute:${brutes.length}`);
 	}
 }
 
