@@ -28,24 +28,20 @@ population.updateTargetPopulation = () => {
     population.all.distHarvester.t = (controllerLevel < 2) ? 2 : 1;
     population.all.upgrader.t = 3;
     population.all.builder.t = utils.numConstructionSites() ? Math.min(3, utils.numConstructionSites() + 1) : 0;
-    population.all.carrier.t = 3;
+    population.all.carrier.t = 3 + (Math.max(0, 2 - population.all.builder.t));
     population.all.repairer.t = 2;
     population.all.miner.t = utils.nonFullContainerCount();
     population.all.brute.t = utils.anyWallsFallen() ? utils.hostileCount() : 0;
 };
 
 population.outputPopulations = () => {
-    let targetPop = "Target Population:  ";
-    let currentPop = "Current Population: ";
-    const keys = Object.keys(population.all);
+    let p = "Population:  ";
 
-    keys.forEach(k => {
-        targetPop += `${k}:${population.all[k].t}, `;
-        currentPop += `${k}:${population.all[k].e}, `;
-    });
-
-    console.log(targetPop);
-    console.log(currentPop);
+    Object.keys(population.all).forEach(k => {
+        p += `${k}:${population.all[k].e}/${population.all[k].t}, `;
+	});
+	
+    console.log(p.substring(0, p.length - 2));
 };
 
 population.getExistingPopulation = () => {
