@@ -8,6 +8,11 @@ const utils = {
     ]
 };
 
+utils.hostileCount = () => {
+    const roomName = utils.getRoomName();
+    return Game.rooms[roomName].find(FIND_HOSTILE_CREEPS).length;
+};
+
 utils.inPanicMode = () => {
     const minRoomEnergy = 500;
     const spawnName = utils.getSpawnName();
@@ -71,15 +76,6 @@ utils.anyWallsFallen = () => {
 
     filter = s => s.structureType == STRUCTURE_WALL && s.hit < 2;
     return creep.room.find(FIND_STRUCTURES, { filter: filter }).length;
-};
-
-utils.clearExpiredCreeps = () => {
-    for (let name in Memory.creeps) {
-        if (!Game.creeps[name]) {
-            delete Memory.creeps[name];
-            console.log('RIP:', name);
-        }
-    }
 };
 
 utils.getRandomName = () => {
