@@ -58,8 +58,14 @@ utils.numConstructionSites = () => {
 };
 
 utils.anyWallsFallen = () => {
+    const expectedWallCount = 10;
     const creep = utils.getAnyCreep();
-    const filter = s => s.structureType == STRUCTURE_WALL && s.hit < 1;
+
+    let filter = s => s.structureType == STRUCTURE_WALL;
+    const allWalls = creep.room.find(FIND_STRUCTURES, { filter: filter });
+    if (allWalls < expectedWallCount) return true;
+
+    filter = s => s.structureType == STRUCTURE_WALL && s.hit < 2;
     return creep.room.find(FIND_STRUCTURES, { filter: filter }).length;
 };
 
