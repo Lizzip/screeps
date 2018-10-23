@@ -87,7 +87,7 @@ utils.numConstructionSites = () => {
 };
 
 utils.anyWallsFallen = () => {
-    const expectedWallCount = 10;
+    const expectedWallCount = 8;
     const creep = utils.getAnyCreep();
 
     let filter = s => s.structureType == STRUCTURE_WALL;
@@ -108,9 +108,24 @@ utils.getRandomName = () => {
     return name;
 }
 
+utils.getCreepWithMemory = (k, v) => {
+	const creeps = Object.keys(Game.creeps);
+	let creep = null;
+	
+	creeps.some(c => {
+		if(Game.creeps[c].memory.hasOwnProperty(k) && Game.creeps[c].memory[k] == v){
+			creep = Game.creeps[c];
+			return true;
+		}
+	});
+	
+	return creep;
+};
+
 utils.getRoomName = () => 'W1N7';
 utils.getSpawnName = () => 'Spawnzilla_1';
 utils.creepExistsWithName = name => !!Game.creeps[name]
 utils.getAnyCreep = () => Game.creeps[Object.keys(Game.creeps)[0]];
+utils.getHeadCount = () => Object.keys(Game.creeps).length;
 
 module.exports = utils;

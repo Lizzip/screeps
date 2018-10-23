@@ -40,8 +40,8 @@ turrets.defendRoom = room => {
         }
 
         //Repair (if not in panic mode)
-        if (!utils.inPanicMode()) {
-            const filter = s => (s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL);
+        /*if (!utils.inPanicMode()) {
+            const filter = s => (s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_ROAD);
             for (let tower of towers) {
                 if (tower.energy > (tower.energyCapacity / 2)) {
                     const closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, { filter: filter });
@@ -50,7 +50,7 @@ turrets.defendRoom = room => {
                     }
                 }
             }
-        }
+        }*/
     }
 };
 
