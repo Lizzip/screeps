@@ -5,11 +5,11 @@ const roleRepairer = {
     classes: [
 		{
 			type: "bigger",
-			format: [WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE]
+			format: [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE]
 		},
 		{
             type: "big",
-            format: [WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE]
+            format: [WORK, CARRY, CARRY, CARRY, MOVE, MOVE]
         },
         {
             type: "basic",
@@ -27,25 +27,25 @@ roleRepairer.getNextTarget = creep => {
 
     while (maxHitpoints < maxTotal) {
         const ramparts = roleRepairer.getRampartsForRepair(creep, maxHitpoints * rampartMultiplier);
-        if (ramparts.length) return ramparts[0];
+        if (ramparts.length) return creep.pos.findClosestByPath(ramparts);
 
         const walls = roleRepairer.getWallsForRepair(creep, maxHitpoints * wallMultiplier);
-        if (walls.length) return walls[0];
+        if (walls.length) return creep.pos.findClosestByPath(walls);
 
         const roads = roleRepairer.getRoadsForRepair(creep, maxHitpoints);
-        if (roads.length) return roads[0];
+        if (roads.length) return creep.pos.findClosestByPath(roads);
 
         maxHitpoints += increment;
     }
 
     const ramparts = roleRepairer.getRampartsForRepair(creep);
-    if (ramparts.length) return ramparts[0];
+    if (ramparts.length) return creep.pos.findClosestByPath(ramparts);
 
     const walls = roleRepairer.getWallsForRepair(creep);
-    if (walls.length) return walls[0];
+    if (walls.length) return creep.pos.findClosestByPath(walls);
 
     const roads = roleRepairer.getRoadsForRepair(creep);
-    if (roads.length) return roads[0];
+    if (roads.length) return creep.pos.findClosestByPath(roads);
 };
 
 roleRepairer.run = creep => {

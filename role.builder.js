@@ -47,11 +47,11 @@ roleBuilder.run = creep => {
             if (partiallyBuiltStructures.length) {
                 roleBuilder.build(creep, partiallyBuiltStructures[0]);
             } else if (containers.length) {
-                roleBuilder.build(creep, containers[0]);
+                roleBuilder.build(creep, creep.pos.findClosestByPath(containers));
             } else if (nonRoads.length) {
-                roleBuilder.build(creep, nonRoads[0]);
+                roleBuilder.build(creep, creep.pos.findClosestByPath(nonRoads));
             } else if (targets[0]) {
-                roleBuilder.build(creep, targets[0]);
+                roleBuilder.build(creep, creep.pos.findClosestByPath(targets));
             } else if (Game.flags.Flag1) {
                 creep.moveTo(Game.flags.Flag1.pos);
             }
