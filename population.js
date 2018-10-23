@@ -28,7 +28,7 @@ population.updateTargetPopulation = () => {
     population.all.distHarvester.t = (controllerLevel < 2) ? 2 : 1;
     population.all.upgrader.t = 3;
     population.all.builder.t = utils.numConstructionSites() ? Math.min(3, utils.numConstructionSites() + 1) : 0;
-    population.all.carrier.t = 3 + (Math.max(0, 2 - population.all.builder.t));
+    population.all.carrier.t = 2 + (Math.max(0, 2 - population.all.builder.t));
     population.all.repairer.t = 2;
     population.all.miner.t = utils.nonFullContainerCount();
     population.all.brute.t = utils.anyWallsFallen() ? utils.hostileCount() : 0;
@@ -91,6 +91,14 @@ population.spawn = role => {
             return true;
         }
     });
+};
+
+population.run = () => {
+	for (const name in Game.creeps) {
+        let creep = Game.creeps[name];
+		const isDistHarvester = (creep.memory.role == 'distHarvester') ? true : null;
+		population.all[creep.memory.role].r.run(creep, isDistHarvester);
+    }
 };
 
 population.clearExpiredCreeps = () => {

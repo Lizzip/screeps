@@ -2,25 +2,6 @@ const utils = require('utils');
 const turrets = require('turrets');
 const pop = require('population');
 
-const roleHarvester = require('role.harvester');
-const roleUpgrader = require('role.upgrader');
-const roleBuilder = require('role.builder');
-const roleMiner = require('role.miner');
-const roleCarrier = require('role.carrier');
-const roleRepairer = require('role.repairer');
-const roleBrute = require('role.brute');
-
-const roles = {
-	brute: roleBrute,
-	harvester: roleHarvester,
-	distHarvester: roleHarvester,
-	carrier: roleCarrier,
-	upgrader: roleUpgrader,
-	miner: roleMiner,
-	builder: roleBuilder,
-	repairer: roleRepairer
-};
-
 const roomName = utils.getRoomName();
 const spawnName = utils.getSpawnName();
 const spawner = Game.spawns[spawnName];
@@ -32,16 +13,10 @@ module.exports.loop = function() {
     pop.updateTargetPopulation();
     pop.getExistingPopulation();
     pop.managePopulation();
+	pop.run();
 
     if (Game.time % 60 == 1) {
         pop.outputPopulations();
-    }
-
-    //Creep Control
-    for (const name in Game.creeps) {
-        let creep = Game.creeps[name];
-		const isDistHarvester = (creep.memory.role == 'distHarvester') ? true : null;
-		roles[creep.memory.role].run(creep, isDistHarvester);
     }
 
     //Tower Control
