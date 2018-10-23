@@ -11,9 +11,10 @@ AI.locateEnergySource = creep => {
     // 5) Closest container with fewer resources than the creep can carry
     // 6) No way of getting energy, go sit at Flag1 and wait for death
 
+	creep.memory.providing = null;
     const maxCarry = creep.carryCapacity;
     let target = AI.getDroppedEnergy(creep, maxCarry);
-
+	
     if (target) {
         //Dropped resource with more resource than creep can carry
         if (creep.pickup(target) == ERR_NOT_IN_RANGE) {
@@ -64,6 +65,7 @@ AI.locateEnergySource = creep => {
 
     //No way of getting energy, go sit at Flag1 and wait for death
     if (Game.flags.Flag1) {
+		creep.memory.target = "Flag";
         creep.moveTo(Game.flags.Flag1.pos);
     }
 };
@@ -88,6 +90,39 @@ AI.hasWorkPart = creep => {
     });
 };
 
+AI.getFirstUnclaimed = structures => {
+	let target = null;
+	
+	if (structures.length){
+		structures.some(t => {
+			if(!utils.getCreepWithMemory('providing', t.id)){
+				target = t;
+				return true;
+			}
+		});
+	}
+	
+	return target;
+};
+
+AI.getClosestUnclaimed = (structures, creep) => {
+	let target = null;
+	let targets = [];
+	
+	if (structures.length){
+		structures.forEach(t => {
+			if(!utils.getCreepWithMemory('providing', t.id)){
+				targets.push(t);
+			}
+		});
+		
+		target = creep.pos.findClosestByPath(targets);
+	}
+	
+	return target;
+};
+
+
 AI.provideEnergyToStructure = creep => {
 	//TODO: Assign creep to structure
 	
@@ -97,40 +132,63 @@ AI.provideEnergyToStructure = creep => {
     // 3) Extension
     // 4) Tower
 
-    let filter = s => s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity;
-    let targets = creep.room.find(FIND_STRUCTURES, { filter: filter });
+    let filter = null;
+    let targets = null;
     let target = null;
-
-    //Spawner
-    if (targets.length) target = targets[0];
+	let previousTarget = creep.memory.providing;
+	
+	//KEEP CURRENT FOCUS - If we have a target and it still needs attention, keep that focus
+	if(previousTarget){
+		filter = s => s.id == previousTarget;
+		const prev = creep.room.find(FIND_STRUCTURES, { filter: filter });
+		
+		//If the target has full energy then unassign self
+		if(prev.length && prev[0].energy < prev[0].energyCapacity){ 
+			target = prev[0];
+		}
+	}
+	
+	//NEW FOCUS
+	
+    //Spawner (always overrides existing focus) 
+	filter = s => s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity;
+	targets = creep.room.find(FIND_STRUCTURES, { filter: filter });
+	if (targets.length){
+		target = creep.pos.findClosestByPath(targets);
+	}
 
     //Tower < 50%
     if (!target) {
         filter = s => (s.structureType == STRUCTURE_TOWER && s.energy < (s.energyCapacity / 2));
         targets = creep.room.find(FIND_STRUCTURES, { filter: filter });
-        if (targets.length) target = targets[0];
+		target = AI.getClosestUnclaimed(targets, creep);
     }
 
     //Extension
     if (!target) {
         filter = s => (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity);
         targets = creep.room.find(FIND_STRUCTURES, { filter: filter });
-        if (targets.length) target = targets[0];
+		target = AI.getClosestUnclaimed(targets, creep);
     }
 
     //Tower
     if (!target) {
         filter = s => (s.structureType == STRUCTURE_TOWER && s.energy < s.energyCapacity);
         targets = creep.room.find(FIND_STRUCTURES, { filter: filter });
-        if (targets.length) target = targets[0];
+        target = AI.getClosestUnclaimed(targets, creep);
     }
 
     if (target) {
+		creep.memory.providing = target.id;
+		creep.say(creep.memory.providing);
+		
         if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
             creep.moveTo(target, { visualizePathStyle: { stroke: '#00ff00' } });
         }
         return true;
-    } else return false;
+    } 
+	else return false;
 };
+
 
 module.exports = AI;
