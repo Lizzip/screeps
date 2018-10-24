@@ -37,7 +37,10 @@ roleScout.run = creep => {
 			}
 			
 			//If we own the controller, send out the Bat Signal
-			utils.spawnScoutHarvesterForRoom(creep.room.name);
+			utils.spawnScoutHarvesterForRoom(creep.room.name, () => {
+				console.log("Claimer out");
+				creep.suicide();
+			});
 		}
 	}
 };

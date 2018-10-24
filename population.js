@@ -7,6 +7,7 @@ const roleMiner = require('role.miner');
 const roleCarrier = require('role.carrier');
 const roleRepairer = require('role.repairer');
 const roleBrute = require('role.brute');
+const roleScout = require('role.scout');
 
 const population = {
     all: {
@@ -18,6 +19,7 @@ const population = {
         miner: { t: 1, e: 0, r: roleMiner },
         builder: { t: 1, e: 0, r: roleBuilder },
         repairer: { t: 1, e: 0, r: roleRepairer },
+		scout: { t: 0, e: 0, r: roleScout },
 		scoutHarvester: { t: 0, e: 0, r: roleHarvester }
     }
 };
@@ -28,11 +30,15 @@ population.updateTargetPopulation = () => {
     population.all.harvester.t = (controllerLevel < 2) ? 2 : 0;
     population.all.distHarvester.t = (controllerLevel < 2) ? 2 : 1;
     population.all.upgrader.t = 3;
-    population.all.builder.t = utils.numConstructionSites() ? Math.min(3, utils.numConstructionSites() + 1) : 0;
+    population.all.builder.t = utils.numConstructionSites() ? /*Math.min(2, utils.numConstructionSites() + 1)*/ 1 : 0;
     population.all.carrier.t = 2 + (Math.max(0, 2 - population.all.builder.t));
     population.all.repairer.t = 2;
     population.all.miner.t = utils.nonFullContainerCount();
     population.all.brute.t = utils.anyWallsFallen() ? utils.hostileCount() : 0;
+	
+	if(utils.unclaimedRoomsList().length){
+		population.all.scoutHarvester.t = 2;
+	}
 };
 
 population.outputPopulations = () => {
@@ -80,13 +86,17 @@ population.spawn = role => {
         console.log("Spawn", role, "next");
     }
 
+	const mem = { role: role, spawnedBy: spawnName };
+	
+	if(role == 'scoutHarvester') mem.targetRoom = utils.unclaimedRoomsList()[0];
+	
     classes.some(c => {
 		const cost = utils.calculateSpawnCost(c.format);
 		
         if (cost <= currentEnergy) {
             let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
 
-            if (spawner.spawnCreep(c.format, newName, { memory: { role: role, spawnedBy: spawnName } }) == OK) {
+            if (spawner.spawnCreep(c.format, newName, { memory: mem }) == OK) {
                 console.log('Spawning ' + newName);
             }
             return true;

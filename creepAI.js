@@ -5,12 +5,13 @@ const AI = {};
 AI.locateEnergySource = creep => {	
     // Priority Order
     // 1) Dropped resource with more resource than the creep can carry
-    // 2) Closest container with more resource than the creep can carry
-    // 3) Any dropped resource
-    // 4) Harvest source if creep has WORK part
-    // 5) Closest container with fewer resources than the creep can carry
-    // 6) No way of getting energy, go sit at Flag1 and wait for death
-
+	// 2) Gravedigging tombstone with >50% of creep carry capacity
+    // 3) Closest container with more resource than the creep can carry
+    // 4) Any dropped resource
+    // 5) Harvest source if creep has WORK part
+    // 6) Closest container with fewer resources than the creep can carry
+    // 7) No way of getting energy, go sit at Flag1 and wait for death
+	
 	creep.memory.providing = null;
     const maxCarry = creep.carryCapacity;
     let target = AI.getDroppedEnergy(creep, maxCarry);
@@ -22,6 +23,16 @@ AI.locateEnergySource = creep => {
         }
         return;
     }
+	
+	target = AI.getTombstoneEnergy(creep, maxCarry/2);
+	
+	if (target) {
+		//Tombstone with >50% of creep carry capacity
+		if (creep.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(target, { visualizePathStyle: { stroke: '#ffffff' } });
+        }
+        return;
+	}
 
     target = AI.getContainer(creep, maxCarry);
 
@@ -44,7 +55,7 @@ AI.locateEnergySource = creep => {
     }
 
     if (AI.hasWorkPart(creep)) {
-        target = creep.room.find(FIND_SOURCES)[0];
+        target = AI.getSource(creep);
 
         //Harvest source if creep has WORK part
         if (creep.harvest(target) == ERR_NOT_IN_RANGE) {
@@ -75,12 +86,23 @@ AI.getDroppedEnergy = (creep, requiredEnergy) => {
     return creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, { filter: droppedEnergyFilter });
 };
 
+AI.getTombstoneEnergy = (creep, requiredEnergy) => {
+	const tombstoneFilter = t => t.store[RESOURCE_ENERGY] > requiredEnergy;
+	return creep.pos.findClosestByPath(FIND_TOMBSTONES, {filter: tombstoneFilter });
+};
+
 AI.getContainer = (creep, requiredEnergy, sort = false) => {
     const containersFilter = s => (s.structureType == STRUCTURE_CONTAINER) && (s.store[RESOURCE_ENERGY] >= requiredEnergy);
     const containers = creep.room.find(FIND_STRUCTURES, { filter: containersFilter });
 
     if (!containers.length) return null;
     return creep.pos.findClosestByPath(containers);
+};
+
+AI.getSource = creep => {
+	const sourcesFilter = s => s.energy > 0;
+	const sources = creep.room.find(FIND_SOURCES, {filter: sourcesFilter});
+	return creep.pos.findClosestByPath(sources);
 };
 
 AI.hasWorkPart = creep => {
@@ -187,6 +209,16 @@ AI.provideEnergyToStructure = creep => {
         return true;
     } 
 	else return false;
+};
+
+AI.moveTowardsTargetRoom = (creep, targetRoom) => {
+	const route = Game.map.findRoute(creep.room, targetRoom);
+	if(route.length > 0) {
+		const exit = creep.pos.findClosestByRange(route[0].exit);
+		creep.moveTo(exit);
+		return true;
+	}
+	return false;
 };
 
 

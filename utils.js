@@ -52,6 +52,7 @@ utils.getControllerLevel = () => {
     const creep = utils.getAnyCreep();
     const filter = s => s.structureType == STRUCTURE_CONTROLLER;
     const controller = creep.room.find(FIND_STRUCTURES, { filter: filter })[0];
+
     return controller.level;
 };
 
@@ -87,7 +88,7 @@ utils.numConstructionSites = () => {
 };
 
 utils.anyWallsFallen = () => {
-    const expectedWallCount = 8;
+    const expectedWallCount = 15;
     const creep = utils.getAnyCreep();
 
     let filter = s => s.structureType == STRUCTURE_WALL;
@@ -126,7 +127,7 @@ utils.getCreepWithMemory = (k, v) => {
 utils.getSpawnersInCurrentRoom = () => utils.getCurrentRoom.find(FIND_MY_SPAWNS); 
 utils.getSpawnersInRoom = room => room.find(FIND_MY_SPAWNS); 
 utils.getSpawnName = () => 'Spawnzilla_1';
-utils.spawnScoutHarvesterForRoom = room => {
+utils.spawnScoutHarvesterForRoom = (room, cb) => {
 	const roomName = utils.claimedRoomsList()[0];
 	const spawners = utils.getSpawnersInRoom(Game.rooms[roomName]);
 	
@@ -134,12 +135,13 @@ utils.spawnScoutHarvesterForRoom = room => {
 		const spawner = spawners[0];
 		const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
 		console.log("Spawning scoutHarvester next");
-		const format = [WORK, CARRY, CARRY, CARRY, MOVE, MOVE];
+		const format = [WORK, CARRY, CARRY, MOVE, MOVE, MOVE];
 		const cost = utils.calculateSpawnCost(format);
 		const newName = `Scout Harvester: ${utils.getRandomName()}`;
 		if (cost <= currentEnergy) {
-			if (spawner.spawnCreep(format, newName, { memory: { role: 'scoutHarvester', spawnedBy: spawnName, targetRoom: room } }) == OK) {
+			if (spawner.spawnCreep(format, newName, { memory: { role: 'scoutHarvester', spawnedBy: spawner.name, targetRoom: room } }) == OK) {
 				console.log('Spawning ' + newName);
+				if(cb) cb();
 			}
 		}
 	}
@@ -154,7 +156,7 @@ utils.getHeadCount = () => Object.keys(Game.creeps).length;
 //Room utilities
 utils.getRoomNamesList = () => ["W1N7", "W2N7"];
 utils.claimedRoomsList = () => ["W1N7"];
-utils.unclaimedRoomsList = () => ["W2N7"];
+utils.unclaimedRoomsList = () => ["W2N7"]; //List of rooms to send scouts classes to 
 utils.getRoomName = () => utils.getAnyCreep().room.name;
 utils.getCurrentRoom = () => utils.getAnyCreep().room.name;
 utils.getCurrentRoomIndex = () => utils.getRoomNamesList().indexOf(utils.getAnyCreep().room.name);

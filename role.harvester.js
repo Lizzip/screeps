@@ -14,7 +14,9 @@ roleHarvester.run = (creep, role) => {
     const focus = (role == 'distHarvester') ? 1 : 0;
 	const traveller = (role == 'scoutHarvester') ? true : false;
 	const spawnedBy = creep.memory.spawnedBy;
-	const spawnedInThisRoom = (creep.room.name == spawnedBy);
+	let spawnedInThisRoom = false;
+	if(utils.getSpawnersInRoom(creep.room).length && utils.getSpawnersInRoom(creep.room)[0].name == spawnedBy) spawnedInThisRoom = true;
+	
 	const targetRoom = creep.memory.targetRoom;
 	
 	if(traveller && spawnedInThisRoom && targetRoom){
@@ -24,8 +26,17 @@ roleHarvester.run = (creep, role) => {
 			const exit = creep.pos.findClosestByRange(route[0].exit);
 			creep.moveTo(exit);
 		}
+		
 	}
 	else {
+		
+		//If we're stuck on the edge, move in one
+		if(traveller) {
+			if(creep.pos.x == 49){
+				creep.move(LEFT);	
+			}
+		}
+				
 		if (!creep.memory.harvesting && creep.carry.energy == 0) {
 			creep.memory.harvesting = true;
 			creep.say('🔄 harvest');
@@ -37,10 +48,24 @@ roleHarvester.run = (creep, role) => {
 		}
 
 		if (creep.memory.harvesting) {
-			const sources = creep.room.find(FIND_SOURCES);
-			if (creep.harvest(sources[focus]) == ERR_NOT_IN_RANGE) {
-				creep.moveTo(sources[focus], { visualizePathStyle: { stroke: '#FFE56D' } });
+			if(targetRoom){
+				//console.log(creep.name, " trying to harvest in", targetRoom)
+				
+				const sources = Game.rooms[targetRoom].find(FIND_SOURCES);
+				const source = creep.pos.findClosestByPath(sources);
+				
+				if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+					//console.log(creep.name, "Moving to", source);
+					creep.moveTo(source, { visualizePathStyle: { stroke: '#FFE56D' } });
+				}
 			}
+			else {
+				const sources = creep.room.find(FIND_SOURCES);
+				if (creep.harvest(sources[focus]) == ERR_NOT_IN_RANGE) {
+					creep.moveTo(sources[focus], { visualizePathStyle: { stroke: '#FFE56D' } });
+				}
+			}
+			
 		} else {
 			if (!AI.provideEnergyToStructure(creep)) {
 				//If we can't provide for anything then be an upgrader if we're a harvester, or add resource to storage if we're a distHarvester
