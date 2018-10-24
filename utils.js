@@ -138,6 +138,7 @@ utils.spawnScoutHarvesterForRoom = room => {
 		const cost = utils.calculateSpawnCost(format);
 		const newName = `Scout Harvester: ${utils.getRandomName()}`;
 		if (cost <= currentEnergy) {
+			if (spawner.spawnCreep(format, newName, { memory: { role: 'scoutHarvester', spawnedBy: spawnName, targetRoom: room } }) == OK) {
 				console.log('Spawning ' + newName);
 			}
 		}

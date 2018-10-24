@@ -37,6 +37,7 @@ roleScout.run = creep => {
 			}
 			
 			//If we own the controller, send out the Bat Signal
+			utils.spawnScoutHarvesterForRoom(creep.room.name);
 		}
 	}
 };
