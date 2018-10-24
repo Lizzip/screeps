@@ -122,7 +122,6 @@ AI.getClosestUnclaimed = (structures, creep) => {
 	return target;
 };
 
-
 AI.provideEnergyToStructure = creep => {
 	//TODO: Assign creep to structure
 	
@@ -180,7 +179,7 @@ AI.provideEnergyToStructure = creep => {
 
     if (target) {
 		creep.memory.providing = target.id;
-		creep.say(creep.memory.providing);
+		//creep.say(creep.memory.providing);
 		
         if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
             creep.moveTo(target, { visualizePathStyle: { stroke: '#00ff00' } });

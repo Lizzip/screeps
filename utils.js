@@ -122,10 +122,44 @@ utils.getCreepWithMemory = (k, v) => {
 	return creep;
 };
 
-utils.getRoomName = () => 'W1N7';
+//Spawn utilities
+utils.getSpawnersInCurrentRoom = () => utils.getCurrentRoom.find(FIND_MY_SPAWNS); 
+utils.getSpawnersInRoom = room => room.find(FIND_MY_SPAWNS); 
 utils.getSpawnName = () => 'Spawnzilla_1';
+utils.spawnScoutHarvesterForRoom = room => {
+	const roomName = utils.claimedRoomsList()[0];
+	const spawners = utils.getSpawnersInRoom(Game.rooms[roomName]);
+	
+	if(spawners.length){
+		const spawner = spawners[0];
+		const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
+		console.log("Spawning scoutHarvester next");
+		const format = [WORK, CARRY, CARRY, CARRY, MOVE, MOVE];
+		const cost = utils.calculateSpawnCost(format);
+		const newName = `Scout Harvester: ${utils.getRandomName()}`;
+		if (cost <= currentEnergy) {
+				console.log('Spawning ' + newName);
+			}
+		}
+	}
+	
+}	
+
+//Creep utilities
 utils.creepExistsWithName = name => !!Game.creeps[name]
 utils.getAnyCreep = () => Game.creeps[Object.keys(Game.creeps)[0]];
 utils.getHeadCount = () => Object.keys(Game.creeps).length;
+
+//Room utilities
+utils.getRoomNamesList = () => ["W1N7", "W2N7"];
+utils.claimedRoomsList = () => ["W1N7"];
+utils.unclaimedRoomsList = () => ["W2N7"];
+utils.getRoomName = () => utils.getAnyCreep().room.name;
+utils.getCurrentRoom = () => utils.getAnyCreep().room.name;
+utils.getCurrentRoomIndex = () => utils.getRoomNamesList().indexOf(utils.getAnyCreep().room.name);
+//utils.getRoomList = () => 
+
+//Controllers
+utils.getControllerInCurrentRoom = () => utils.getCurrentRoom().controller;
 
 module.exports = utils;

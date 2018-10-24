@@ -17,7 +17,8 @@ const population = {
         upgrader: { t: 1, e: 0, r: roleUpgrader },
         miner: { t: 1, e: 0, r: roleMiner },
         builder: { t: 1, e: 0, r: roleBuilder },
-        repairer: { t: 1, e: 0, r: roleRepairer }
+        repairer: { t: 1, e: 0, r: roleRepairer },
+		scoutHarvester: { t: 0, e: 0, r: roleHarvester }
     }
 };
 
@@ -85,7 +86,7 @@ population.spawn = role => {
         if (cost <= currentEnergy) {
             let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
 
-            if (spawner.spawnCreep(c.format, newName, { memory: { role: role } }) == OK) {
+            if (spawner.spawnCreep(c.format, newName, { memory: { role: role, spawnedBy: spawnName } }) == OK) {
                 console.log('Spawning ' + newName);
             }
             return true;
@@ -96,8 +97,7 @@ population.spawn = role => {
 population.run = () => {
 	for (const name in Game.creeps) {
         let creep = Game.creeps[name];
-		const isDistHarvester = (creep.memory.role == 'distHarvester') ? true : null;
-		population.all[creep.memory.role].r.run(creep, isDistHarvester);
+		population.all[creep.memory.role].r.run(creep, creep.memory.role);
     }
 };
 
