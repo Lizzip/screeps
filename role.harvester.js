@@ -21,12 +21,7 @@ roleHarvester.run = (creep, role) => {
 	
 	if(traveller && spawnedInThisRoom && targetRoom){
 		//Head to next room
-		const route = Game.map.findRoute(creep.room, targetRoom);
-		if(route.length > 0) {
-			const exit = creep.pos.findClosestByRange(route[0].exit);
-			creep.moveTo(exit);
-		}
-		
+		AI.moveTowardsTargetRoom(creep, targetRoom);		
 	}
 	else {
 		

@@ -1,6 +1,7 @@
 const utils = require('utils');
 const turrets = require('turrets');
 const pop = require('population');
+const structures = require('structures');
 
 const roomName = utils.getRoomName();
 const spawnName = utils.getSpawnName();
@@ -17,6 +18,7 @@ module.exports.loop = function() {
 
     if (Game.time % 60 == 1) {
         pop.outputPopulations();
+		structures.buildMissingStructures();
     }
 
     //Tower Control

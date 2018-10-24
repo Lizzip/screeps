@@ -1,4 +1,5 @@
 const utils = require('utils');
+const AI = require('creepAI');
 
 const roleScout = {
     classes: [
@@ -21,14 +22,7 @@ roleScout.run = creep => {
 	});
 	
 	if(target){
-		const route = Game.map.findRoute(creep.room, target);
-		if(route.length > 0) {
-			//Move to new room
-			console.log('Now heading to room ' + route[0].room);
-			const exit = creep.pos.findClosestByRange(route[0].exit);
-			creep.moveTo(exit);
-		}
-		else {
+		if(!AI.moveTowardsTargetRoom(creep, target)){
 			//If we don't own the controller, claim it
 			if(!creep.room.controller.my){
 				if(creep.claimController(creep.room.controller) == ERR_NOT_IN_RANGE) {
