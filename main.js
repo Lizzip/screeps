@@ -16,11 +16,6 @@ module.exports.loop = function() {
     pop.managePopulation();
     pop.run();
 
-    if (Game.time % 60 == 1) {
-        pop.outputPopulations();
-        structures.buildMissingStructures();
-    }
-
     //Tower Control
     turrets.buildIfIsDown(room);
     turrets.defendRoom(room);
@@ -34,5 +29,11 @@ module.exports.loop = function() {
                 spawner.pos.x + 1,
                 spawner.pos.y, { align: 'left', opacity: 0.8 });
         }
+    }
+
+    //Functions to run every 60 ticks
+    if (Game.time % 60 == 1) {
+        pop.outputPopulations();
+        structures.buildMissingStructures();
     }
 }

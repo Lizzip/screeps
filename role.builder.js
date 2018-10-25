@@ -2,12 +2,11 @@ const utils = require('utils');
 const AI = require('creepAI');
 
 const roleBuilder = {
-    classes: [
-		{
-			type: "bigger",
-			format: [WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE]
-		},
-		{
+    classes: [{
+            type: "bigger",
+            format: [WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE]
+        },
+        {
             type: "big",
             format: [WORK, WORK, CARRY, CARRY, MOVE, MOVE]
         },
@@ -31,9 +30,10 @@ roleBuilder.run = creep => {
     if (creep.memory.building) {
         //Priority order:
         // 1) Partially built structures 
-        // 2) Containers
-        // 2) Other non-road structures
-        // 3) New build roads
+        // 2) Spawn
+        // 3) Containers
+        // 4) Other non-road structures
+        // 5) New build roads
 
         if (utils.inPanicMode()) {
             creep.say("PANICKING!");
@@ -41,11 +41,14 @@ roleBuilder.run = creep => {
         } else {
             const targets = creep.room.find(FIND_CONSTRUCTION_SITES);
             const partiallyBuiltStructures = _.filter(targets, target => target.progress > 0);
+            const spawns = _.filter(targets, target => target.structureType == 'spawn');
             const containers = _.filter(targets, target => target.structureType == 'container');
             const nonRoads = _.filter(targets, target => target.structureType != 'road');
 
             if (partiallyBuiltStructures.length) {
                 roleBuilder.build(creep, partiallyBuiltStructures[0]);
+            } else if (spawns.length) {
+                roleBuilder.build(creep, creep.pos.findClosestByPath(spawns));
             } else if (containers.length) {
                 roleBuilder.build(creep, creep.pos.findClosestByPath(containers));
             } else if (nonRoads.length) {
