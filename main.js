@@ -14,11 +14,11 @@ module.exports.loop = function() {
     pop.updateTargetPopulation();
     pop.getExistingPopulation();
     pop.managePopulation();
-	pop.run();
+    pop.run();
 
     if (Game.time % 60 == 1) {
         pop.outputPopulations();
-		structures.buildMissingStructures();
+        structures.buildMissingStructures();
     }
 
     //Tower Control
