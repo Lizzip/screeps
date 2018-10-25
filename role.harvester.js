@@ -13,7 +13,6 @@ roleHarvester.run = (creep, role) => {
     const spawnedBy = creep.memory.spawnedBy;
     let spawnedInThisRoom = false;
     if (utils.getSpawnersInRoom(creep.room).length && utils.getSpawnersInRoom(creep.room)[0].name == spawnedBy) spawnedInThisRoom = true;
-
     const targetRoom = creep.memory.targetRoom;
 
     if (targetRoom && spawnedInThisRoom) {

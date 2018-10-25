@@ -6,26 +6,26 @@ const utils = {
         "Michelle Gibson", "Mictian", "One Armed Clint", "Perry Crofte", "Poppy", "Porcelain Doll", "Randy Nedley", "Red", "Revenants", "Robert Malick", "Robin Jett", "Rosita Bustillos", "Samuel Larson",
         "Shae Pressman", "Shopkeeper", "Shorty", "Stevie", "The Widows", "Theodore Roosevelt", "Tucker Gardner", "Ward Earp", "Waverly Earp", "Whiskey Jim", "Wyatt Earp", "Xavier Dolls"
     ],
-	costs: {
-		move: 50,
-		work: 100,
-		carry: 50,
-		attack: 80,
-		ranged_attack: 150,
-		heal: 250,
-		claim: 600,
-		tough: 10
-	}
+    costs: {
+        move: 50,
+        work: 100,
+        carry: 50,
+        attack: 80,
+        ranged_attack: 150,
+        heal: 250,
+        claim: 600,
+        tough: 10
+    }
 };
 
 utils.calculateSpawnCost = bodyArray => {
-	let cost = 0;
-	bodyArray.forEach(part => {
-		if(utils.costs.hasOwnProperty(part)){
-			cost += utils.costs[part];
-		}
-	});
-	return cost;
+    let cost = 0;
+    bodyArray.forEach(part => {
+        if (utils.costs.hasOwnProperty(part)) {
+            cost += utils.costs[part];
+        }
+    });
+    return cost;
 };
 
 utils.hostileCount = () => {
@@ -110,43 +110,62 @@ utils.getRandomName = () => {
 }
 
 utils.getCreepWithMemory = (k, v) => {
-	const creeps = Object.keys(Game.creeps);
-	let creep = null;
-	
-	creeps.some(c => {
-		if(Game.creeps[c].memory.hasOwnProperty(k) && Game.creeps[c].memory[k] == v){
-			creep = Game.creeps[c];
-			return true;
-		}
-	});
-	
-	return creep;
+    const creeps = Object.keys(Game.creeps);
+    let creep = null;
+
+    creeps.some(c => {
+        if (Game.creeps[c].memory.hasOwnProperty(k) && Game.creeps[c].memory[k] == v) {
+            creep = Game.creeps[c];
+            return true;
+        }
+    });
+
+    return creep;
 };
 
 //Spawn utilities
-utils.getSpawnersInCurrentRoom = () => utils.getCurrentRoom.find(FIND_MY_SPAWNS); 
-utils.getSpawnersInRoom = room => room.find(FIND_MY_SPAWNS); 
+utils.getSpawnersInCurrentRoom = () => utils.getCurrentRoom.find(FIND_MY_SPAWNS);
+utils.getSpawnersInRoom = room => room.find(FIND_MY_SPAWNS);
 utils.getSpawnName = () => 'Spawnzilla_1';
 utils.spawnScoutHarvesterForRoom = (room, cb) => {
-	const roomName = utils.claimedRoomsList()[0];
-	const spawners = utils.getSpawnersInRoom(Game.rooms[roomName]);
-	
-	if(spawners.length){
-		const spawner = spawners[0];
-		const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
-		console.log("Spawning scoutHarvester next");
-		const format = [WORK, CARRY, CARRY, MOVE, MOVE, MOVE];
-		const cost = utils.calculateSpawnCost(format);
-		const newName = `Scout Harvester: ${utils.getRandomName()}`;
-		if (cost <= currentEnergy) {
-			if (spawner.spawnCreep(format, newName, { memory: { role: 'scoutHarvester', spawnedBy: spawner.name, targetRoom: room } }) == OK) {
-				console.log('Spawning ' + newName);
-				if(cb) cb();
-			}
-		}
-	}
-	
-}	
+    const roomName = utils.claimedRoomsList()[0];
+    const spawners = utils.getSpawnersInRoom(Game.rooms[roomName]);
+
+    if (spawners.length) {
+        const spawner = spawners[0];
+        const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
+        console.log("Spawning scoutHarvester next");
+        const format = [WORK, CARRY, CARRY, MOVE, MOVE, MOVE];
+        const cost = utils.calculateSpawnCost(format);
+        const newName = `Scout Harvester: ${utils.getRandomName()}`;
+        if (cost <= currentEnergy) {
+            if (spawner.spawnCreep(format, newName, { memory: { role: 'scoutHarvester', spawnedBy: spawner.name, targetRoom: room } }) == OK) {
+                console.log('Spawning ' + newName);
+                if (cb) cb();
+            }
+        }
+    }
+};
+
+utils.spawnScoutBuilderForRoom = room => {
+    const roomName = utils.claimedRoomsList()[0];
+    const spawners = utils.getSpawnersInRoom(Game.rooms[roomName]);
+
+    if (spawners.length) {
+        const spawner = spawners[0];
+        const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
+        console.log("Spawning scoutBuilder next");
+        const format = [WORK, CARRY, CARRY, MOVE, MOVE, MOVE];
+        const cost = utils.calculateSpawnCost(format);
+        const newName = `Scout Builder: ${utils.getRandomName()}`;
+        if (cost <= currentEnergy) {
+            if (spawner.spawnCreep(format, newName, { memory: { role: 'scoutBuilder', spawnedBy: spawner.name, targetRoom: room } }) == OK) {
+                console.log('Spawning ' + newName);
+                if (cb) cb();
+            }
+        }
+    }
+};
 
 //Creep utilities
 utils.creepExistsWithName = name => !!Game.creeps[name]

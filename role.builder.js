@@ -17,51 +17,71 @@ const roleBuilder = {
     ]
 };
 
-roleBuilder.run = creep => {
-    if (creep.memory.building && creep.carry.energy == 0) {
-        creep.memory.building = false;
-        creep.say('🔄 harvest');
-    }
-    if (!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
-        creep.memory.building = true;
-        creep.say('🚧 build');
-    }
+roleBuilder.run = (creep, role) => {
+    const spawnedBy = creep.memory.spawnedBy;
+    let spawnedInThisRoom = false;
+    if (utils.getSpawnersInRoom(creep.room).length && utils.getSpawnersInRoom(creep.room)[0].name == spawnedBy) spawnedInThisRoom = true;
+    const targetRoom = creep.memory.targetRoom;
 
-    if (creep.memory.building) {
-        //Priority order:
-        // 1) Partially built structures 
-        // 2) Spawn
-        // 3) Containers
-        // 4) Other non-road structures
-        // 5) New build roads
-
-        if (utils.inPanicMode()) {
-            creep.say("PANICKING!");
-            AI.provideEnergyToStructure(creep);
-        } else {
-            const targets = creep.room.find(FIND_CONSTRUCTION_SITES);
-            const partiallyBuiltStructures = _.filter(targets, target => target.progress > 0);
-            const spawns = _.filter(targets, target => target.structureType == 'spawn');
-            const containers = _.filter(targets, target => target.structureType == 'container');
-            const nonRoads = _.filter(targets, target => target.structureType != 'road');
-
-            if (partiallyBuiltStructures.length) {
-                roleBuilder.build(creep, partiallyBuiltStructures[0]);
-            } else if (spawns.length) {
-                roleBuilder.build(creep, creep.pos.findClosestByPath(spawns));
-            } else if (containers.length) {
-                roleBuilder.build(creep, creep.pos.findClosestByPath(containers));
-            } else if (nonRoads.length) {
-                roleBuilder.build(creep, creep.pos.findClosestByPath(nonRoads));
-            } else if (targets[0]) {
-                roleBuilder.build(creep, creep.pos.findClosestByPath(targets));
-            } else if (Game.flags.Flag1) {
-                creep.moveTo(Game.flags.Flag1.pos);
-            }
-        }
+    if (targetRoom && spawnedInThisRoom) {
+        //Head to next room
+        AI.moveTowardsTargetRoom(creep, targetRoom);
     } else {
-        AI.locateEnergySource(creep);
+        if (creep.memory.building && creep.carry.energy == 0) {
+            creep.memory.building = false;
+            creep.say('🔄 harvest');
+        }
+        if (!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
+            creep.memory.building = true;
+            creep.say('🚧 build');
+        }
+
+        if (creep.memory.building) {
+            if (utils.inPanicMode()) {
+                creep.say("PANICKING!");
+                AI.provideEnergyToStructure(creep);
+            } else {
+                const target = roleBuilder.chooseBuildingTarget(creep);
+                if (target) {
+                    roleBuilder.build(creep, target);
+                } else if (Game.flags.Flag1) {
+                    creep.moveTo(Game.flags.Flag1.pos);
+                }
+            }
+        } else {
+            AI.locateEnergySource(creep);
+        }
     }
+};
+
+roleBuilder.chooseBuildingTarget = creep => {
+    //Priority order:
+    // 1) Partially built structures 
+    // 2) Spawn
+    // 3) Containers
+    // 4) Other non-road structures
+    // 5) New build roads
+
+    const targets = creep.room.find(FIND_CONSTRUCTION_SITES);
+    const partiallyBuiltStructures = _.filter(targets, target => target.progress > 0);
+    const spawns = _.filter(targets, target => target.structureType == 'spawn');
+    const containers = _.filter(targets, target => target.structureType == 'container');
+    const nonRoads = _.filter(targets, target => target.structureType != 'road');
+    let target = null;
+
+    if (partiallyBuiltStructures.length) {
+        target = partiallyBuiltStructures[0];
+    } else if (spawns.length) {
+        target = creep.pos.findClosestByPath(spawns);
+    } else if (containers.length) {
+        target = creep.pos.findClosestByPath(containers);
+    } else if (nonRoads.length) {
+        target = creep.pos.findClosestByPath(nonRoads);
+    } else if (targets[0]) {
+        target = creep.pos.findClosestByPath(targets);
+    }
+
+    return target
 };
 
 roleBuilder.build = (creep, target) => {
