@@ -28,8 +28,8 @@ utils.calculateSpawnCost = bodyArray => {
     return cost;
 };
 
-utils.hostileCount = () => {
-    const roomName = utils.getRoomName();
+utils.hostileCount = r => {
+    const roomName = r || utils.getRoomName();
     return Game.rooms[roomName].find(FIND_HOSTILE_CREEPS).length;
 };
 
@@ -48,16 +48,16 @@ utils.inPanicMode = () => {
     return true;
 };
 
-utils.getControllerLevel = () => {
-    const creep = utils.getAnyCreep();
+utils.getControllerLevel = c => {
+    const creep = c || utils.getAnyCreep();
     const filter = s => s.structureType == STRUCTURE_CONTROLLER;
     const controller = creep.room.find(FIND_STRUCTURES, { filter: filter })[0];
 
     return controller.level;
 };
 
-utils.maxPossibleBuildEnergy = () => {
-    const creep = utils.getAnyCreep();
+utils.maxPossibleBuildEnergy = c => {
+    const creep = c || utils.getAnyCreep();
     const spawnCapacity = 300;
     const extensionCapacity = 50;
 
@@ -66,8 +66,8 @@ utils.maxPossibleBuildEnergy = () => {
     return spawnCapacity + (extensionCapacity * extensions.length);
 };
 
-utils.currentAvailableBuildEnergy = spawner => {
-    const creep = utils.getAnyCreep();
+utils.currentAvailableBuildEnergy = (spawner, c) => {
+    const creep = c || utils.getAnyCreep();
     const filter = s => s.structureType == STRUCTURE_EXTENSION;
     const extensions = creep.room.find(FIND_STRUCTURES, { filter: filter });
 
@@ -76,20 +76,26 @@ utils.currentAvailableBuildEnergy = spawner => {
     return totalEnergy;
 };
 
-utils.nonFullContainerCount = () => {
-    const creep = utils.getAnyCreep();
+utils.containerCount = c => {
+    const creep = c || utils.getAnyCreep();
+    const containerFilter = s => s.structureType == STRUCTURE_CONTAINER;
+    return creep.room.find(FIND_STRUCTURES, { filter: containerFilter }).length;
+};
+
+utils.nonFullContainerCount = c => {
+    const creep = c || utils.getAnyCreep();
     const notFullContainerFilter = s => (s.structureType == STRUCTURE_CONTAINER) && (s.store[RESOURCE_ENERGY] < s.storeCapacity);
     return creep.room.find(FIND_STRUCTURES, { filter: notFullContainerFilter }).length;
 };
 
-utils.numConstructionSites = () => {
-    const creep = utils.getAnyCreep();
+utils.numConstructionSites = c => {
+    const creep = c || utils.getAnyCreep();
     return creep.room.find(FIND_CONSTRUCTION_SITES).length;
 };
 
-utils.anyWallsFallen = () => {
-    const expectedWallCount = 15;
-    const creep = utils.getAnyCreep();
+utils.anyWallsFallen = c => {
+    const expectedWallCount = 15; //TODO: pull from structure.js
+    const creep = c || utils.getAnyCreep();
 
     let filter = s => s.structureType == STRUCTURE_WALL;
     const allWalls = creep.room.find(FIND_STRUCTURES, { filter: filter });
@@ -107,8 +113,91 @@ utils.getRandomName = () => {
     }
 
     return name;
-}
+};
 
+//Spawn utilities
+utils.getSpawnersInCurrentRoom = () => utils.getCurrentRoom.find(FIND_MY_SPAWNS);
+utils.getSpawnersInRoom = room => room.find(FIND_MY_SPAWNS);
+utils.getSpawnName = () => 'Spawnzilla_1';
+utils.spawnScoutHarvesterForRoom = (room, cb) => {
+    /*
+    const roomName = utils.claimedRoomsList()[0];
+    const spawners = utils.getSpawnersInRoom(Game.rooms[roomName]);
+
+    if (spawners.length) {
+        const spawner = spawners[0];
+        const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
+        console.log("Spawning scoutHarvester next");
+        const format = [WORK, CARRY, CARRY, MOVE, MOVE, MOVE];
+        const cost = utils.calculateSpawnCost(format);
+        const newName = `Scout Harvester: ${utils.getRandomName()}`;
+        if (cost <= currentEnergy) {
+            if (spawner.spawnCreep(format, newName, { memory: { role: 'scoutHarvester', spawnedBy: spawner.name, targetRoom: room, spawnRoom: roomName } }) == OK) {
+                console.log('Spawning ' + newName);
+                if (cb) cb();
+            }
+        }
+    }*/
+};
+
+utils.spawnScoutBuilderForRoom = room => {
+    const roomName = utils.claimedRoomsList()[0];
+    const spawners = utils.getSpawnersInRoom(Game.rooms[roomName]);
+
+    if (spawners.length) {
+        const spawner = spawners[0];
+        const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
+        console.log("Spawning scoutBuilder next");
+        const format = [WORK, CARRY, CARRY, MOVE, MOVE, MOVE];
+        const cost = utils.calculateSpawnCost(format);
+        const newName = `Scout Builder: ${utils.getRandomName()}`;
+
+        if (cost <= currentEnergy) {
+            if (spawner.spawnCreep(format, newName, { memory: { role: 'scoutBuilder', spawnedBy: spawner.name, targetRoom: room, spawnRoom: roomName } }) == OK) {
+                console.log('Spawning ' + newName);
+                if (cb) cb();
+            }
+        }
+    }
+};
+
+//Creep utilities
+utils.creepExistsWithName = name => !!Game.creeps[name]
+utils.getAnyCreep = () => Game.creeps[Object.keys(Game.creeps)[0]];
+utils.getAnyCreepInRoom = room => {
+    const allCreeps = Object.keys(Game.creeps);
+    let creep = null;
+
+    allCreeps.some(c => {
+        const sr = Game.creeps[c].memory.spawnRoom;
+        const tr = Game.creeps[c].memory.targetRoom;
+
+        if (tr && tr == room) {
+            creep = Game.creeps[c];
+            return true;
+        }
+
+        if (!tr && sr == room) {
+            creep = Game.creeps[c];
+            return true;
+        }
+    });
+    return creep;
+};
+utils.getNumCreepsInRoomWithRole = (room, role) => {
+    const filter = c => {
+        const sr = Game.creeps[c].memory.spawnRoom;
+        const tr = Game.creeps[c].memory.targetRoom;
+        const r = Game.creeps[c].memory.role;
+
+        if (r == role && ((tr && tr == room) || (!tr && sr == room))) {
+            return true;
+        }
+    }
+    const allCreeps = Object.keys(Game.creeps);
+    return allCreeps.filter(filter).length;
+};
+utils.getHeadCount = () => Object.keys(Game.creeps).length;
 utils.getCreepWithMemory = (k, v) => {
     const creeps = Object.keys(Game.creeps);
     let creep = null;
@@ -123,63 +212,13 @@ utils.getCreepWithMemory = (k, v) => {
     return creep;
 };
 
-//Spawn utilities
-utils.getSpawnersInCurrentRoom = () => utils.getCurrentRoom.find(FIND_MY_SPAWNS);
-utils.getSpawnersInRoom = room => room.find(FIND_MY_SPAWNS);
-utils.getSpawnName = () => 'Spawnzilla_1';
-utils.spawnScoutHarvesterForRoom = (room, cb) => {
-    const roomName = utils.claimedRoomsList()[0];
-    const spawners = utils.getSpawnersInRoom(Game.rooms[roomName]);
-
-    if (spawners.length) {
-        const spawner = spawners[0];
-        const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
-        console.log("Spawning scoutHarvester next");
-        const format = [WORK, CARRY, CARRY, MOVE, MOVE, MOVE];
-        const cost = utils.calculateSpawnCost(format);
-        const newName = `Scout Harvester: ${utils.getRandomName()}`;
-        if (cost <= currentEnergy) {
-            if (spawner.spawnCreep(format, newName, { memory: { role: 'scoutHarvester', spawnedBy: spawner.name, targetRoom: room } }) == OK) {
-                console.log('Spawning ' + newName);
-                if (cb) cb();
-            }
-        }
-    }
-};
-
-utils.spawnScoutBuilderForRoom = room => {
-    const roomName = utils.claimedRoomsList()[0];
-    const spawners = utils.getSpawnersInRoom(Game.rooms[roomName]);
-
-    if (spawners.length) {
-        const spawner = spawners[0];
-        const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
-        console.log("Spawning scoutBuilder next");
-        const format = [WORK, CARRY, CARRY, MOVE, MOVE, MOVE];
-        const cost = utils.calculateSpawnCost(format);
-        const newName = `Scout Builder: ${utils.getRandomName()}`;
-        if (cost <= currentEnergy) {
-            if (spawner.spawnCreep(format, newName, { memory: { role: 'scoutBuilder', spawnedBy: spawner.name, targetRoom: room } }) == OK) {
-                console.log('Spawning ' + newName);
-                if (cb) cb();
-            }
-        }
-    }
-};
-
-//Creep utilities
-utils.creepExistsWithName = name => !!Game.creeps[name]
-utils.getAnyCreep = () => Game.creeps[Object.keys(Game.creeps)[0]];
-utils.getHeadCount = () => Object.keys(Game.creeps).length;
-
 //Room utilities
-utils.getRoomNamesList = () => ["W1N7", "W2N7"];
+utils.getRoomNamesList = () => Game.rooms;
 utils.claimedRoomsList = () => ["W1N7"];
 utils.unclaimedRoomsList = () => ["W2N7"]; //List of rooms to send scouts classes to 
 utils.getRoomName = () => utils.getAnyCreep().room.name;
 utils.getCurrentRoom = () => utils.getAnyCreep().room.name;
 utils.getCurrentRoomIndex = () => utils.getRoomNamesList().indexOf(utils.getAnyCreep().room.name);
-//utils.getRoomList = () => 
 
 //Controllers
 utils.getControllerInCurrentRoom = () => utils.getCurrentRoom().controller;

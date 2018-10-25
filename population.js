@@ -18,27 +18,34 @@ const population = {
         upgrader: { t: 1, e: 0, r: roleUpgrader },
         miner: { t: 1, e: 0, r: roleMiner },
         builder: { t: 1, e: 0, r: roleBuilder },
+        scoutBuilder: { t: 0, e: 0, r: roleBuilder },
         repairer: { t: 1, e: 0, r: roleRepairer },
-		scout: { t: 0, e: 0, r: roleScout },
-		scoutHarvester: { t: 0, e: 0, r: roleHarvester }
+        scout: { t: 0, e: 0, r: roleScout },
+        scoutHarvester: { t: 0, e: 0, r: roleHarvester }
     }
 };
 
-population.updateTargetPopulation = () => {
-    const controllerLevel = utils.getControllerLevel();
+population.updateTargetPopulationForRoom = room => {
+    const controllerLevel = Game.rooms[room].controller.level;
+    const creep = utils.getAnyCreepInRoom(room);
+    const all = population.all;
 
-    population.all.harvester.t = (controllerLevel < 2) ? 2 : 0;
-    population.all.distHarvester.t = (controllerLevel < 2) ? 2 : 1;
-    population.all.upgrader.t = 3;
-    population.all.builder.t = utils.numConstructionSites() ? /*Math.min(2, utils.numConstructionSites() + 1)*/ 1 : 0;
-    population.all.carrier.t = 2 + (Math.max(0, 2 - population.all.builder.t));
-    population.all.repairer.t = 2;
-    population.all.miner.t = utils.nonFullContainerCount();
-    population.all.brute.t = utils.anyWallsFallen() ? utils.hostileCount() : 0;
-	
-	if(utils.unclaimedRoomsList().length){
-		population.all.scoutHarvester.t = 2;
-	}
+    all.harvester.t = (controllerLevel < 2) ? 2 : 0;
+    all.distHarvester.t = (controllerLevel < 2) ? 2 : 1;
+    all.upgrader.t = Math.max(1, Math.min(controllerLevel, 3));
+    all.builder.t = utils.numConstructionSites(creep) ? Math.min(2, utils.numConstructionSites(creep) + 1) : 0;
+    all.carrier.t = 2 + (Math.max(0, 2 - population.all.builder.t));
+    all.repairer.t = Math.min(Math.floor(controllerLevel / 2), 2);
+    all.miner.t = utils.nonFullContainerCount(creep);
+    all.brute.t = utils.anyWallsFallen(creep) ? utils.hostileCount(room) : 0;
+
+    if (utils.unclaimedRoomsList().length) {
+        const isUnclaimedRoom = utils.unclaimedRoomsList().indexOf(room);
+
+        if (isUnclaimedRoom > -1) {
+            population.all.scoutHarvester.t = 2;
+        }
+    }
 };
 
 population.outputPopulations = () => {
@@ -46,16 +53,17 @@ population.outputPopulations = () => {
 
     Object.keys(population.all).forEach(k => {
         p += `${k}:${population.all[k].e}/${population.all[k].t}, `;
-	});
-	
+    });
+
     console.log(p.substring(0, p.length - 2));
 };
 
-population.getExistingPopulation = () => {
+population.getExistingPopulationForRoom = room => {
     const keys = Object.keys(population.all);
 
     keys.forEach(k => {
-        population.all[k].e = _.filter(Game.creeps, creep => creep.memory.role == k).length;
+        population.all[k].e = utils.getNumCreepsInRoomWithRole(room, k);
+        //population.all[k].e = _.filter(Game.creeps, creep => creep.memory.role == k).length;
     });
 };
 
@@ -78,21 +86,22 @@ population.managePopulation = () => {
 population.spawn = role => {
     const spawnName = utils.getSpawnName();
     const spawner = Game.spawns[spawnName];
-	const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
-	const script = population.all[role].r;
-	const classes = script.classes;
+    const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
+    const classes = population.all[role].r.classes;
 
-	if (Game.time % 10 == 1) {
+    if (Game.time % 10 == 1) {
         console.log("Spawn", role, "next");
     }
 
-	const mem = { role: role, spawnedBy: spawnName };
-	
-	if(role == 'scoutHarvester') mem.targetRoom = utils.unclaimedRoomsList()[0];
-	
+    const mem = { role: role, spawnedBy: spawnName, spawnRoom: spawner.room.name };
+
+    if (role.includes('scout') && utils.unclaimedRoomsList().length) {
+        mem.targetRoom = utils.unclaimedRoomsList()[0];
+    }
+
     classes.some(c => {
-		const cost = utils.calculateSpawnCost(c.format);
-		
+        const cost = utils.calculateSpawnCost(c.format);
+
         if (cost <= currentEnergy) {
             let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
 
@@ -104,10 +113,10 @@ population.spawn = role => {
     });
 };
 
-population.run = () => {
-	for (const name in Game.creeps) {
+population.runAllCreeps = () => {
+    for (const name in Game.creeps) {
         let creep = Game.creeps[name];
-		population.all[creep.memory.role].r.run(creep, creep.memory.role);
+        population.all[creep.memory.role].r.run(creep, creep.memory.role);
     }
 };
 
@@ -118,6 +127,23 @@ population.clearExpiredCreeps = () => {
             console.log('RIP:', name);
         }
     }
+};
+
+population.manageAllRooms = () => {
+    const rooms = Object.keys(utils.getRoomNamesList());
+    const p = population;
+
+    if (false == true) {
+        rooms.forEach(room => {
+            p.updateTargetPopulationForRoom(room);
+            p.getExistingPopulationForRoom(room);
+            p.managePopulationForRoom(room);
+        });
+    }
+
+    p.updateTargetPopulationForRoom("W1N7");
+    p.getExistingPopulationForRoom("W1N7");
+    p.managePopulation("W1N7");
 };
 
 module.exports = population;

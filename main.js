@@ -11,10 +11,8 @@ const room = Game.rooms[roomName];
 module.exports.loop = function() {
     //Population Control
     pop.clearExpiredCreeps();
-    pop.updateTargetPopulation();
-    pop.getExistingPopulation();
-    pop.managePopulation();
-    pop.run();
+    pop.runAllCreeps();
+    pop.manageAllRooms();
 
     //Tower Control
     turrets.buildIfIsDown(room);
@@ -36,4 +34,4 @@ module.exports.loop = function() {
         pop.outputPopulations();
         structures.buildMissingStructures();
     }
-}
+};
