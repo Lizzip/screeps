@@ -15,8 +15,7 @@ module.exports.loop = function() {
     pop.manageAllRooms();
 
     //Tower Control
-    turrets.buildIfIsDown(room);
-    turrets.defendRoom(room);
+	turrets.defendAllRooms();
 
     //Spawner Control 
     if (spawner.spawning) {
@@ -31,7 +30,8 @@ module.exports.loop = function() {
 
     //Functions to run every 60 ticks
     if (Game.time % 60 == 1) {
-        pop.outputPopulations();
         structures.buildMissingStructures();
     }
+	
+	//utils.spawnScoutBuilderForRoom("W2N7");
 };

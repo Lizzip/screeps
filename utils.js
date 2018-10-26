@@ -120,7 +120,6 @@ utils.getSpawnersInCurrentRoom = () => utils.getCurrentRoom.find(FIND_MY_SPAWNS)
 utils.getSpawnersInRoom = room => room.find(FIND_MY_SPAWNS);
 utils.getSpawnName = () => 'Spawnzilla_1';
 utils.spawnScoutHarvesterForRoom = (room, cb) => {
-    /*
     const roomName = utils.claimedRoomsList()[0];
     const spawners = utils.getSpawnersInRoom(Game.rooms[roomName]);
 
@@ -137,10 +136,10 @@ utils.spawnScoutHarvesterForRoom = (room, cb) => {
                 if (cb) cb();
             }
         }
-    }*/
+    }
 };
 
-utils.spawnScoutBuilderForRoom = room => {
+utils.spawnScoutBuilderForRoom = (room, cb) => {
     const roomName = utils.claimedRoomsList()[0];
     const spawners = utils.getSpawnersInRoom(Game.rooms[roomName]);
 
@@ -187,10 +186,10 @@ utils.getAnyCreepInRoom = room => {
 utils.getNumCreepsInRoomWithRole = (room, role) => {
     const filter = c => {
         const sr = Game.creeps[c].memory.spawnRoom;
-        const tr = Game.creeps[c].memory.targetRoom;
+        //const tr = Game.creeps[c].memory.targetRoom;
         const r = Game.creeps[c].memory.role;
 
-        if (r == role && ((tr && tr == room) || (!tr && sr == room))) {
+        if (r == role && sr == room){//((tr && tr == room) || (!tr && sr == room))) {
             return true;
         }
     }

@@ -32,21 +32,26 @@ population.updateTargetPopulationForRoom = room => {
 
     all.harvester.t = (controllerLevel < 2) ? 2 : 0;
     all.distHarvester.t = (controllerLevel < 2) ? 2 : 1;
-    all.upgrader.t = Math.max(1, Math.min(controllerLevel, 3));
+    all.upgrader.t = Math.max(1, Math.min(Math.floor(controllerLevel/2), 3));
     all.builder.t = utils.numConstructionSites(creep) ? Math.min(2, utils.numConstructionSites(creep) + 1) : 0;
     all.carrier.t = 2 + (Math.max(0, 2 - population.all.builder.t));
     all.repairer.t = Math.min(Math.floor(controllerLevel / 2), 2);
     all.miner.t = utils.nonFullContainerCount(creep);
     all.brute.t = utils.anyWallsFallen(creep) ? utils.hostileCount(room) : 0;
 
-    if (utils.unclaimedRoomsList().length) {
-        const isUnclaimedRoom = utils.unclaimedRoomsList().indexOf(room);
-
-        if (isUnclaimedRoom > -1) {
-            population.all.scoutHarvester.t = 2;
-        }
-    }
+	//all.scoutHarvester.t = 1;
+	//all.scoutBuilder.t = 3;
 };
+
+population.outputPopulationForRoom = room => {
+	let p = `Population ${room}:  `;
+
+    Object.keys(population.all).forEach(k => {
+        p += `${k}:${population.all[k].e}/${population.all[k].t}, `;
+    });
+
+    console.log(p.substring(0, p.length - 2));
+}
 
 population.outputPopulations = () => {
     let p = "Population:  ";
@@ -63,11 +68,10 @@ population.getExistingPopulationForRoom = room => {
 
     keys.forEach(k => {
         population.all[k].e = utils.getNumCreepsInRoomWithRole(room, k);
-        //population.all[k].e = _.filter(Game.creeps, creep => creep.memory.role == k).length;
     });
 };
 
-population.managePopulation = () => {
+population.managePopulationForRoom = room => {
     let spawnNext = null;
     const keys = Object.keys(population.all);
 
@@ -79,38 +83,42 @@ population.managePopulation = () => {
     });
 
     if (spawnNext) {
-        population.spawn(spawnNext);
+        population.spawn(spawnNext, room);
     }
 };
 
-population.spawn = role => {
-    const spawnName = utils.getSpawnName();
-    const spawner = Game.spawns[spawnName];
-    const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
-    const classes = population.all[role].r.classes;
+population.spawn = (role, roomName) => {
+	const spawners = Game.rooms[roomName].find(FIND_MY_SPAWNS); 
 
-    if (Game.time % 10 == 1) {
-        console.log("Spawn", role, "next");
-    }
+	if(spawners.length){
+		const spawner = spawners[0];
+		const spawnName = spawner.name;
+		const currentEnergy = utils.currentAvailableBuildEnergy(spawner);
+		const classes = population.all[role].r.classes;
 
-    const mem = { role: role, spawnedBy: spawnName, spawnRoom: spawner.room.name };
+		if (Game.time % 10 == 1) {
+			console.log("Spawn", role, "next");
+		}
 
-    if (role.includes('scout') && utils.unclaimedRoomsList().length) {
-        mem.targetRoom = utils.unclaimedRoomsList()[0];
-    }
+		const mem = { role: role, spawnedBy: spawnName, spawnRoom: spawner.room.name };
 
-    classes.some(c => {
-        const cost = utils.calculateSpawnCost(c.format);
+		if (role.includes('scout') && utils.unclaimedRoomsList().length) {
+			mem.targetRoom = utils.unclaimedRoomsList()[0];
+		}
 
-        if (cost <= currentEnergy) {
-            let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
+		classes.some(c => {
+			const cost = utils.calculateSpawnCost(c.format);
 
-            if (spawner.spawnCreep(c.format, newName, { memory: mem }) == OK) {
-                console.log('Spawning ' + newName);
-            }
-            return true;
-        }
-    });
+			if (cost <= currentEnergy) {
+				let newName = `${c.type} ${role}: ${utils.getRandomName()}`;
+
+				if (spawner.spawnCreep(c.format, newName, { memory: mem }) == OK) {
+					console.log('Spawning ' + newName);
+				}
+				return true;
+			}
+		});
+	}
 };
 
 population.runAllCreeps = () => {
@@ -133,17 +141,24 @@ population.manageAllRooms = () => {
     const rooms = Object.keys(utils.getRoomNamesList());
     const p = population;
 
-    if (false == true) {
+    //if (false == true) {
         rooms.forEach(room => {
             p.updateTargetPopulationForRoom(room);
             p.getExistingPopulationForRoom(room);
             p.managePopulationForRoom(room);
+			
+			if (Game.time % 60 == 1) {
+				p.outputPopulationForRoom(room);
+			}
         });
-    }
-
+    //}
+/*
     p.updateTargetPopulationForRoom("W1N7");
     p.getExistingPopulationForRoom("W1N7");
-    p.managePopulation("W1N7");
+    p.managePopulationForRoom("W1N7");
+	if (Game.time % 60 == 1) {
+		p.outputPopulationForRoom("W1N7");
+	}*/
 };
 
 module.exports = population;
